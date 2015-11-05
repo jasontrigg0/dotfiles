@@ -8,7 +8,7 @@
 
 dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )" #this script's directory
 olddir=$(dirname $dir)/dotfiles_old #old dotfiles backup directory
-files="bashrc vimrc vim zshrc oh-my-zsh private scrotwm.conf Xresources"    # list of files/folders to symlink in homedir
+files="bashrc emacs vimrc vim zshrc oh-my-zsh private scrotwm.conf Xresources"    # list of files/folders to symlink in homedir
 
 ##########
 
@@ -29,3 +29,9 @@ for file in $files; do
     echo "Creating symlink to $file in home directory."
     ln -s $dir/$file ~/.$file
 done
+
+
+#setup .emacs.d directory
+#http://www.lingotrek.com/2010/12/integrating-emacs-with-x11-clipboard-in.html
+sudo apt-get install xclip
+ln -snf $dir/xclip.el ~/.emacs.d/xclip.el

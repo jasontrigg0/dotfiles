@@ -1,8 +1,10 @@
 ;to reload this file: 
 ;M-x load-file and then enter twice
 
-;emacs-copy also copies to the clipboard
-(load-file "/home/jason/.emacs.d/xclip.el")
+;emacs-copy also copies + pastes to/from the clipboard
+;possibly requires installing xclip 1.3 in emacs24 also?
+(load-file "/home/jtrigg/.emacs.d/xclip.el")
+
 
 ;automatically run chmod +x when appropriate
 (add-hook 'after-save-hook 'executable-make-buffer-file-executable-if-script-p)
