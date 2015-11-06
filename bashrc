@@ -125,11 +125,11 @@ alias l="less"
 alias emacs="emacsclient --alternate-editor= -t"
 export EDITOR="emacsclient --alternate-editor= -t"
 # export GOPATH=$HOME/go
-# export ANDROID_HOME=/home/jason/Files/android_dev/android-sdk-linux
-export PATH=$PATH:/home/jason/Dropbox/misc_code/utils:/home/jason/Dropbox/misc_code/utils/R:$GOPATH/bin:$ANDROID_HOME/platforms:$ANDROID_HOME/tools:/home/jason/Files/play
-export PYTHONPATH=$PYTHONPATH:/home/jason/Dropbox/misc_code/utils
+# export ANDROID_HOME=$HOME/Files/android_dev/android-sdk-linux
+export PATH=$PATH:$HOME/Dropbox/misc_code/utils:$HOME/Dropbox/misc_code/utils/R:$GOPATH/bin:$ANDROID_HOME/platforms:$ANDROID_HOME/tools:$HOME/Files/play
+export PYTHONPATH=$PYTHONPATH:$HOME/Dropbox/misc_code/utils
 
-# export NVM_DIR="/home/jason/.nvm"
+# export NVM_DIR="$HOME/.nvm"
 # [ -s "$NVM_DIR/nvm.sh" ] && source "$NVM_DIR/nvm.sh"  # This loads nvm
 
 

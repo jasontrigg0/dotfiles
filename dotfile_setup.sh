@@ -30,8 +30,11 @@ for file in $files; do
     ln -s $dir/$file ~/.$file
 done
 
-
 #setup .emacs.d directory
 #http://www.lingotrek.com/2010/12/integrating-emacs-with-x11-clipboard-in.html
 sudo apt-get install xclip
 ln -snf $dir/xclip.el ~/.emacs.d/xclip.el
+
+#start using the new bashrc
+source ~/.bashrc
+
