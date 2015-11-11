@@ -135,11 +135,20 @@ export PYTHONPATH=$PYTHONPATH:$HOME/Dropbox/misc_code/utils
 
 
 function b() { sudo bash -c "echo $1 > /sys/class/backlight/intel_backlight/brightness"; }
-function h() { grep $1 ~/.bash_history | tail; }
+function h() { grep -a $1 ~/.bash_history | tail; }
 function kt() { pkill -9 -P $$; } #kill all children of this terminal
+function db() { mysql -B -h ec2-54-86-91-29.compute-1.amazonaws.com -e "$1" | pawk.py -d $'\t'; }
 
 ###
 #write to bash_history after each command!
 shopt -s histappend                      # append to history, don't overwrite it
 export PROMPT_COMMAND="history -a; history -c; history -r; $PROMPT_COMMAND"
 ###
+
+
+#
+alias icbm='python tools/icbm/build.py'
+alias play='thirdparty/play/play'
+function bplay() {
+  echo -e "\033];$1\007" && icbm :$1_dev && thirdparty/play/play test src/com/start/$1 ${@:2}
+}
