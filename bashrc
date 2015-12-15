@@ -152,3 +152,4 @@ alias play='thirdparty/play/play'
 function bplay() {
   echo -e "\033];$1\007" && icbm :$1_dev && thirdparty/play/play test src/com/start/$1 ${@:2}
 }
+

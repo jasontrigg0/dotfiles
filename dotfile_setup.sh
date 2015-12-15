@@ -25,16 +25,17 @@ echo "done"
 # move any existing dotfiles in homedir to dotfiles_old directory, then create symlinks from the homedir to any files in the ~/dotfiles directory specified in $files
 for file in $files; do
     echo "Moving any existing dotfiles from ~ to $olddir"
-    mv ~/.$file $olddir
+    mv $HOME/.$file $olddir
     echo "Creating symlink to $file in home directory."
-    ln -s $dir/$file ~/.$file
+    ln -s $dir/$file $HOME/.$file
 done
 
 #setup .emacs.d directory
 #http://www.lingotrek.com/2010/12/integrating-emacs-with-x11-clipboard-in.html
-sudo apt-get install xclip
-ln -snf $dir/xclip.el ~/.emacs.d/xclip.el
-
-#start using the new bashrc
-source ~/.bashrc
+{
+    sudo apt-get install xclip &&
+    ln -snf $dir/xclip.el $HOME/.emacs.d/xclip.el;
+} || {
+    echo "ERROR: unable to install xclip";
+}
 
