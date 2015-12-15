@@ -1,6 +1,12 @@
 ;to reload this file: 
 ;M-x load-file and then enter twice
 
+
+;use 4 spaces instead of tabs
+(setq-default indent-tabs-mode nil)
+(setq tab-width 4)
+
+
 ;emacs-copy also copies + pastes to/from the clipboard
 ;possibly requires installing xclip 1.3 in emacs24 also?
 (load-file "/home/jtrigg/.emacs.d/xclip.el")
@@ -14,7 +20,7 @@
 (global-set-key (kbd "C-c r") (lambda ()
 				(interactive)
 				(revert-buffer t t t)
-				                                (message "buffer is reverted")))
+                (message "buffer is reverted")))
 
 
 ;IDE stuff
@@ -54,7 +60,6 @@
 ;; the following so that Ctrl-Shift-Right Arrow moves selected text one 
 ;; column to the right, Ctrl-Shift-Left Arrow moves selected text one
 ;; column to the left:
-
 (global-set-key [C-S-right] 'shift-right)
 (global-set-key [C-S-left] 'shift-left)
 
@@ -67,3 +72,25 @@
     (let ((dir (file-name-directory filename)))
       (unless (file-exists-p dir)
         (make-directory dir)))))
+
+
+
+;automatically set comment based on file extension
+(defvar comment-based-on-extension-alist nil "alist of regexps and comment characters")
+(setq comment-based-on-extension-alist '(("emacs$" ";" "") ("Snakefile$" "#" "") (".txt$" ">" "") (".scss$" "/* " " */")))
+
+(defun setup-comment-based-on-extension ()
+  (let ((alist comment-based-on-extension-alist))
+    (while alist
+      (when (string-match-p (caar alist) (buffer-file-name))
+        (setq comment-start (car (cdr (car alist))))
+        (setq comment-end (car (cdr (cdr (car alist)))))
+        (setq alist nil))
+      (setq alist (cdr alist)))))
+(add-hook 'find-file-hook 'setup-comment-based-on-extension)
+
+
+
+;setup files with certain endings to open in the proper mode
+(add-to-list 'auto-mode-alist '("\\emacs\\'" . emacs-lisp-mode))
+(add-to-list 'auto-mode-alist '("\\.scss\\'" . css-mode))
