@@ -4,13 +4,10 @@
 # This script creates symlinks from the home directory to any desired dotfiles in ~/dotfiles
 ############################
 
-########## Variables
-
 dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )" #this script's directory
 olddir=$(dirname $dir)/dotfiles_old #old dotfiles backup directory
-files="bashrc emacs gitignore" # list of files/folders to symlink in homedir
+files="bashrc emacs gitignore" #list of files/folders to symlink in homedir
 
-##########
 
 # create dotfiles_old in homedir
 echo -n "Creating $olddir for backup of any existing dotfiles in ~ ..."
@@ -29,6 +26,15 @@ for file in $files; do
     echo "Creating symlink to $file in home directory."
     ln -s $dir/$file $HOME/.$file
 done
+
+
+#setup .ssh config
+if [ -f "$dir/sshconfig" ]
+then
+    mv ~/.ssh/config $olddir
+    ln -s $dir/sshconfig ~/.ssh/config
+fi
+
 
 #setup .emacs.d directory
 #http://www.lingotrek.com/2010/12/integrating-emacs-with-x11-clipboard-in.html

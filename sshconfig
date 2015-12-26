@@ -1,0 +1,3 @@
+Host ec2-54-86-91-29.compute-1.amazonaws.com
+ IdentityFile ~/.ssh/jason-key-pair-useast.pem
+ 
