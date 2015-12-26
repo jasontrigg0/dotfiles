@@ -8,7 +8,7 @@
 
 dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )" #this script's directory
 olddir=$(dirname $dir)/dotfiles_old #old dotfiles backup directory
-files="bashrc emacs vimrc vim zshrc oh-my-zsh private scrotwm.conf Xresources"    # list of files/folders to symlink in homedir
+files="bashrc emacs gitignore" # list of files/folders to symlink in homedir
 
 ##########
 
@@ -38,4 +38,8 @@ done
 } || {
     echo "ERROR: unable to install xclip";
 }
+
+
+#setup global .gitignore
+git config --global core.excludesfile $HOME/.gitignore
 

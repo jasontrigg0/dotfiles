@@ -17,10 +17,10 @@
 
 
 ;revert buffer
-(global-set-key (kbd "C-c r") (lambda ()
-				(interactive)
-				(revert-buffer t t t)
-                (message "buffer is reverted")))
+;; (global-set-key (kbd "C-c r") (lambda ()
+;; 				(interactive)
+;; 				(revert-buffer t t t)
+;;                 (message "buffer is reverted")))
 
 
 ;IDE stuff
@@ -28,7 +28,8 @@
 (ido-mode t)
 
 ;ESS: emacs for R
-(ess-toggle-underscore nil)
+;jtrigg@20151219 this isn't working
+;(ess-toggle-underscore nil)
 
 ;Python
 ;; (require 'ipython)
@@ -92,5 +93,7 @@
 
 
 ;setup files with certain endings to open in the proper mode
+;(single quote matches end-of-string)
 (add-to-list 'auto-mode-alist '("\\emacs\\'" . emacs-lisp-mode))
 (add-to-list 'auto-mode-alist '("\\.scss\\'" . css-mode))
+(add-to-list 'auto-mode-alist '("\\ashrc\\'" . sh-mode)) ;HACK: for some reason including the b in "bashrc" here doesn't work??
