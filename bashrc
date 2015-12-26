@@ -16,8 +16,8 @@ HISTCONTROL=ignoreboth
 shopt -s histappend
 
 # for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
-HISTSIZE=5000
-HISTFILESIZE=5000
+HISTSIZE=50000
+HISTFILESIZE=50000
 
 # check the window size after each command and, if necessary,
 # update the values of LINES and COLUMNS.
@@ -119,8 +119,7 @@ function cl() { if $(test $# -gt 0); then cd $1; fi; if $(test $(ls | wc -l) -lt
 # alias .="cl .."
 # alias ..="cl ../.."
 # alias ...="cl ../../.."
-# alias emacs="emacs -nw"
-alias sudo="sudo "
+alias sudo="sudo " #without this aliases aren't available when using sudo
 alias l="less"
 alias emacs="emacsclient --alternate-editor= -t"
 export EDITOR="emacsclient --alternate-editor= -t"
@@ -137,7 +136,10 @@ export PYTHONPATH=$PYTHONPATH:$HOME/Dropbox/misc_code/utils
 function b() { sudo bash -c "echo $1 > /sys/class/backlight/intel_backlight/brightness"; }
 function h() { grep -a $1 ~/.bash_history | tail; }
 function kt() { pkill -9 -P $$; } #kill all children of this terminal
+function ff() { ls -ltu $(find . -name '*'$1'*') | awk '{print $9}' | head -1; } #find most recently updated file with this name under this directory
 function db() { mysql -B -h ec2-54-86-91-29.compute-1.amazonaws.com -e "$1" | pawk.py -d $'\t'; }
+function xsh() { cat - | tr '\n' '\0' | xargs -0 -n1 bash -c; } #run each line of /dev/stdin in bash
+function ew() { emacs $(which $1); }
 
 ###
 #write to bash_history after each command!
