@@ -136,10 +136,16 @@ export PYTHONPATH=$PYTHONPATH:$HOME/Dropbox/misc_code/utils
 function b() { sudo bash -c "echo $1 > /sys/class/backlight/intel_backlight/brightness"; }
 function h() { grep -a $1 ~/.bash_history | tail; }
 function kt() { pkill -9 -P $$; } #kill all children of this terminal
-function ff() { ls -ltu $(find . -name '*'$1'*') | awk '{print $9}' | head -1; } #find most recently updated file with this name under this directory
-function db() { mysql -B -h ec2-54-86-91-29.compute-1.amazonaws.com -e "$1" | pawk.py -d $'\t'; }
+function ff() { ls -ltu $(find . -name '*'$1'*') | awk '{print $9}'; } #files with this name under this directory
+function ff1() { ls -ltu $(find . -name '*'$1'*') | awk '{print $9}' | head -1; } #find most recently updated file with this name under this directory
+function gf() { grep -r -l -i $1 .; } #recursive grep for files containing the string in the current directory
+function db() { mysql -B -h ec2-54-86-91-29.compute-1.amazonaws.com -e "$1" | pawk.py -d $'\t' | plook; }
 function xsh() { cat - | tr '\n' '\0' | xargs -0 -n1 bash -c; } #run each line of /dev/stdin in bash
 function ew() { emacs $(which $1); }
+function ms() { cd $HOME/github/mysize_shopping; }
+
+function gl() { git diff HEAD~$1 HEAD; }
+function gp() { git stash; git pull --rebase; git stash apply; }
 
 ###
 #write to bash_history after each command!

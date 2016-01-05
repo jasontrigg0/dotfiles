@@ -1,6 +1,15 @@
 ;to reload this file: 
 ;M-x load-file and then enter twice
 
+;MELPA package archive
+(when (>= emacs-major-version 24)
+  (require 'package)
+  (add-to-list
+   'package-archives
+   '("melpa" . "http://melpa.org/packages/")
+   t)
+  (package-initialize))
+
 
 ;use 4 spaces instead of tabs
 (setq-default indent-tabs-mode nil)
@@ -97,3 +106,8 @@
 (add-to-list 'auto-mode-alist '("\\emacs\\'" . emacs-lisp-mode))
 (add-to-list 'auto-mode-alist '("\\.scss\\'" . css-mode))
 (add-to-list 'auto-mode-alist '("\\ashrc\\'" . sh-mode)) ;HACK: for some reason including the b in "bashrc" here doesn't work??
+
+
+;mode for js inside html
+(require 'web-mode)
+(add-to-list 'auto-mode-alist '("\\.html$" . web-mode))
