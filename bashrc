@@ -121,6 +121,7 @@ function cl() { if $(test $# -gt 0); then cd $1; fi; if $(test $(ls | wc -l) -lt
 # alias ...="cl ../../.."
 alias sudo="sudo " #without this aliases aren't available when using sudo
 alias l="less"
+alias ptr="transpose.py"
 alias emacs="emacsclient --alternate-editor= -t"
 export EDITOR="emacsclient --alternate-editor= -t"
 # export GOPATH=$HOME/go
@@ -132,20 +133,28 @@ export PYTHONPATH=$PYTHONPATH:$HOME/Dropbox/misc_code/utils
 # [ -s "$NVM_DIR/nvm.sh" ] && source "$NVM_DIR/nvm.sh"  # This loads nvm
 
 
-
+function mic() { amixer set Capture toggle; }
 function b() { sudo bash -c "echo $1 > /sys/class/backlight/intel_backlight/brightness"; }
 function h() { grep -a $1 ~/.bash_history | tail; }
 function kt() { pkill -9 -P $$; } #kill all children of this terminal
 function ff() { ls -ltu $(find . -name '*'$1'*') | awk '{print $9}'; } #files with this name under this directory
 function ff1() { ls -ltu $(find . -name '*'$1'*') | awk '{print $9}' | head -1; } #find most recently updated file with this name under this directory
 function gf() { grep -r -l -i $1 .; } #recursive grep for files containing the string in the current directory
-function db() { mysql -B -h ec2-54-86-91-29.compute-1.amazonaws.com -e "$1" | pawk.py -d $'\t' | plook; }
 function xsh() { cat - | tr '\n' '\0' | xargs -0 -n1 bash -c; } #run each line of /dev/stdin in bash
 function ew() { emacs $(which $1); }
-function ms() { cd $HOME/github/mysize_shopping; }
 
+#git shortcuts
 function gl() { git diff HEAD~$1 HEAD; }
 function gp() { git stash; git pull --rebase; git stash apply; }
+function gg() { git log -p -S$1; }
+
+#startup mysql shortcuts
+function dbraw() { mysql -B -h pants-me.com -e "$1" | pawk -d '\t'; }
+function db() { dbraw "$1" | plook -a; }
+function dbt() { dbraw "$1" | ptr | plook -a -n; }
+function asin() { dbt 'select * from start.amazon_products where asin = "'$1'"'; }
+function sibling_asin() { db 'select * from start.amazon_products where parent_asin = (select parent_asin from start.amazon_products where asin = "'$1'")'; }
+function ms() { cd $HOME/github/mysize_shopping; }
 
 ###
 #write to bash_history after each command!
