@@ -152,6 +152,7 @@ function gg() { git log -p -S$1; }
 function dbraw() { mysql -B -h pants-me.com -e "$1" | pawk -d '\t'; }
 function db() { dbraw "$1" | plook -a; }
 function dbt() { dbraw "$1" | ptr | plook -a -n; }
+function get() { dbt 'select * from start.amazon_products where '$1' = "'$2'"'; }
 function asin() { dbt 'select * from start.amazon_products where asin = "'$1'"'; }
 function sibling_asin() { db 'select * from start.amazon_products where parent_asin = (select parent_asin from start.amazon_products where asin = "'$1'")'; }
 function ms() { cd $HOME/github/mysize_shopping; }
