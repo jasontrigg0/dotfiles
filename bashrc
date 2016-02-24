@@ -121,7 +121,6 @@ function cl() { if $(test $# -gt 0); then cd $1; fi; if $(test $(ls | wc -l) -lt
 # alias ...="cl ../../.."
 alias sudo="sudo " #without this aliases aren't available when using sudo
 alias l="less"
-alias ptr="transpose.py"
 alias emacs="emacsclient --alternate-editor= -t"
 export EDITOR="emacsclient --alternate-editor= -t"
 # export GOPATH=$HOME/go
@@ -142,6 +141,7 @@ function ff1() { ls -ltu $(find . -name '*'$1'*') | awk '{print $9}' | head -1; 
 function gf() { grep -r -l -i $1 .; } #recursive grep for files containing the string in the current directory
 function xsh() { cat - | tr '\n' '\0' | xargs -0 -n1 bash -c; } #run each line of /dev/stdin in bash
 function ew() { emacs $(which $1); }
+function echoerr() { echo "$@" 1>&2; }
 
 #git shortcuts
 function gl() { git diff HEAD~$1 HEAD; }
@@ -150,8 +150,10 @@ function gg() { git log -p -S$1; }
 
 #startup mysql shortcuts
 function dbraw() { mysql -B -h pants-me.com -e "$1" | pawk -d '\t'; }
-function db() { dbraw "$1" | plook -a; }
+function db() { dbraw "$1" | plook; }
+function dbh() { dbraw "select * from "$1" limit 10" | plook; }
 function dbt() { dbraw "$1" | ptr | plook -a -n; }
+function dbwhere() { db "select * from start.amazon_products where $1"; }
 function get() { dbt 'select * from start.amazon_products where '$1' = "'$2'"'; }
 function asin() { dbt 'select * from start.amazon_products where asin = "'$1'"'; }
 function sibling_asin() { db 'select * from start.amazon_products where parent_asin = (select parent_asin from start.amazon_products where asin = "'$1'")'; }
@@ -171,3 +173,6 @@ function bplay() {
   echo -e "\033];$1\007" && icbm :$1_dev && thirdparty/play/play test src/com/start/$1 ${@:2}
 }
 
+function bplay_prod() {
+    echo -e "\033];$1\007" && icbm :$1_deploy && thirdparty/play/play run src/com/start/$1 --%prod ${@:2}
+}
