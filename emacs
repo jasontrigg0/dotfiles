@@ -1,5 +1,5 @@
-;to reload this file: 
-;M-x load-file and then enter twice
+;;to reload this file: 
+;;M-x load-file and then enter twice
 
 ;MELPA package archive
 (when (>= emacs-major-version 24)
@@ -86,6 +86,7 @@
 (global-set-key (kbd "C-c R") 'rename-file-and-buffer)
 
 ;; source: http://steve.yegge.googlepages.com/my-dot-emacs-file
+;; added (shell-command (concat "chmod u+x " new-name))
 (defun rename-file-and-buffer (new-name)
   "Renames both current buffer and file it's visiting to NEW-NAME."
   (interactive "sNew name: ")
@@ -99,7 +100,8 @@
           (rename-file name new-name 1)
           (rename-buffer new-name)
           (set-visited-file-name new-name)
-          (set-buffer-modified-p nil))))))
+          (set-buffer-modified-p nil)
+          (shell-command (concat "chmod u+x " new-name)))))))
 
 
 ;automatically create intermediate directories when opening new files 
@@ -138,3 +140,88 @@
 ;mode for js inside html
 (require 'web-mode)
 (add-to-list 'auto-mode-alist '("\\.html$" . web-mode))
+
+;;set by customize-face:
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(highlight-indentation-face ((t (:background "color-238" :foreground "white"))))
+ '(web-mode-html-tag-bracket-face ((t (:foreground "white")))))
+
+
+
+
+;;open-line copied from:
+;;http://emacsredux.com/blog/2013/06/15/open-line-above/
+(defun smart-open-line ()
+    "Insert an empty line after the current line.
+Position the cursor at its beginning, according to the current mode."
+    (interactive)
+    (move-end-of-line nil)
+    (newline-and-indent))
+
+(global-set-key [(shift return)] 'smart-open-line)
+
+(defun smart-open-line-above ()
+    "Insert an empty line above the current line.
+Position the cursor at it's beginning, according to the current mode."
+    (interactive)
+    (move-beginning-of-line nil)
+    (newline-and-indent)
+    (forward-line -1)
+    (indent-according-to-mode))
+
+(global-set-key [(control shift return)] 'smart-open-line-above)
+
+(global-set-key (kbd "M-n") 'smart-open-line)
+;;was using "M-O" for smart-open-line-above but then
+;;touchpad scrolling inserted random "A"s and "B"s into my file
+(global-set-key (kbd "M-N") 'smart-open-line-above)
+
+
+;;tried flycheck but it hasn't been so helpful:
+;; (eval-after-load 'flycheck
+;;   '(flycheck-add-mode 'html-tidy 'web-mode))
+
+;; (global-flycheck-mode)
+
+;; (set-face-attribute 'flycheck-warning nil
+;;                    :foreground "yellow"
+;;                     :background "red")))
+
+;; (eval-after-load 'flycheck
+;;     '(flycheck-add-mode 'html-tidy 'web-mode))
+
+
+
+
+;; python-mode.el (!= default emacs python mode)
+;; (autoload 'python-mode "python-mode" "Python Mode." t)
+;; (add-to-list 'auto-mode-alist '("\\.py\\'" . python-mode))
+;; (add-to-list 'interpreter-mode-alist '("python" . python-mode))
+
+
+
+;https://github.com/jorgenschaefer/elpy
+;sudo pip install jedi required for elpy
+(package-initialize)
+(elpy-enable)
+
+
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
+
+(defun module_fns ()
+  (interactive)
+  (elpy-goto-definition)
+  (elpy-occur-definitions)
+  (other-window 1)
+  (previous-buffer))
+  
+(global-set-key (kbd "C-c C-a") 'module_fns)
