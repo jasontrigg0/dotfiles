@@ -85,10 +85,161 @@ if [ -x /usr/bin/dircolors ]; then
     alias egrep='egrep --color=auto'
 fi
 
+
+#keep ctrl+s from freezing terminal window:
+#http://unix.stackexchange.com/a/12108
+stty -ixon
+
+#from this guy's cool bashrc:
+#https://gist.github.com/redguardtoo/01868d7a13817c9845e8#file-bashrc
+GREPCMD="grep -rsnI --exclude=*.log --exclude=*.properties --exclude=TAGS --exclude=tags --exclude=GTAGS --exclude-dir=.svn --exclude-dir=bower_components --exclude-dir=node_modules --exclude-dir=dist --exclude-dir=.sass-cache --exclude-dir=.cache  --exclude-dir=.cvs --exclude-dir=.git --exclude-dir=test --exclude-dir=tests --exclude-dir=.hg --exclude-dir=.metadata --exclude-dir=logs --exclude=#*# --exclude=*.swp --exclude=*.min.js --exclude=*.min.css --exclude=*~ --color=auto"
+
+function a () {
+    $GREPCMD "$@"
+}
+
+function pclip() {
+    if [ "$OS_NAME" ==  "CYGWIN" ]; then
+        putclip $@;
+    elif [ "$OS_NAME" == "Darwin" ]; then
+        pbcopy $@;
+    else
+        if [ -x /usr/bin/xsel ]; then
+            xsel -ib $@;
+        else
+            if [ -x /usr/bin/xclip ]; then
+                xclip -selection c $@;
+            else
+                echo "Neither xsel or xclip is installed!"
+            fi
+        fi
+    fi
+}
+
+function h () {
+    # reverse history, pick up one line, remove new line characters and put it into clipboard
+    if [ -z "$1" ]; then
+        echo "Usage: h keyword [-v]"
+        echo "  '-v' will filter OUT matched you typing interactively"
+    else
+        history | grep "$1" | sed '1!G;h;$!d' | percol $2 | sed -n 's/^ *[0-9][0-9]* *\(.*\)$/\1/p'| tr -d '\n' | pclip
+    fi
+}
+
+# search the file and pop up dialog, then put the full path in clipboard
+function baseff()
+{
+    local fullpath=$*
+    local filename=${fullpath##*/} # remove "/" from the beginning
+    filename=${filename##*./} # remove  ".../" from the beginning
+    #  only the filename without path is needed
+    # filename should be reasonable
+    local cli=`find . -not -iwholename '*/.gradle/*' -not -iwholename '*/dist/*' -not -iwholename '*.class' -not -iwholename '*.elc' -not -iwholename '*.pyc' -not -iwholename '*/vendor/*' -not -iwholename '*/bower_components/*' -not -iwholename '*/node_modules/*' -not -iwholename '*/target/*' -not -iwholename '*.svn*' -not -iwholename '*.git*' -not -iwholename '*.sass-cache*' -not -iwholename '*.hg*' -type f -path '*'${filename}'*' -print | percol`
+    # convert relative path to full path
+    echo $(cd $(dirname $cli); pwd)/$(basename $cli)
+}
+
+# find a file and copy its *nix directory (without filename) into clipboard
+# cd into that directory at the same time
+function ffcd()
+{
+    local cli=`baseff $*`
+    local dir=$(dirname "${cli}")
+    cd ${dir} && echo ${dir}
+    echo -n ${cli} | pclip
+}
+
+# find a file and copy its *nix full path into clipboard
+function ff()
+{
+    local cli=`baseff $*`
+    #echo ${cli} | sed 's%^'${HOME}'%~%'
+    #echo -n ${cli}  | sed 's%^'${HOME}'%~%' | pclip
+    echo ${cli}
+    echo -n ${cli} | pclip
+}
+
+#find a file and emacs that file
+function ffe() {
+    local cli=$(baseff $*)
+    echo -n ${cli} | pclip
+    e ${cli}
+}
+
+function gf()
+{
+    # @see http://stackoverflow.com/questions/13373249/extract-substring-using-regexp-in-plain-bash
+    local fullpath=$*
+    local filename=${fullpath##*/}
+    local filter=${fullpath##*./}
+
+    # only the filename without path is needed
+    # filename should be reasonable
+    local cli=`find $(git rev-parse --show-toplevel) -not -iwholename '*.svn*' -not -iwholename '*.git*' -not -iwholename '*.sass-cache*' -not -iwholename '*.hg*' -type f -iname '*'${filename}'*' -print | grep ${filter} | percol`
+    echo ${cli}
+    echo -n ${cli} | pclip;
+}
+
+# find file containing string
+function fs()
+{
+    local cli=`${GREPCMD} -l $* $PWD/*| percol`
+    echo -n ${cli} | pclip;
+    echo ${cli}
+}
+
+# Easy extact
+extract () {
+  if [ -f $1 ] ; then
+      case $1 in
+          *.tar.xz)    tar xvJf $1    ;;
+          *.tar.bz2)   tar xvjf $1    ;;
+          *.tar.gz)    tar xvzf $1    ;;
+          *.bz2)       bunzip2 $1     ;;
+          *.rar)       unrar e $1     ;;
+          *.gz)        gunzip $1      ;;
+          *.tar)       tar xvf $1     ;;
+          *.tbz2)      tar xvjf $1    ;;
+          *.tgz)       tar xvzf $1    ;;
+          *.apk)       unzip $1       ;;
+          *.epub)      unzip $1       ;;
+          *.xpi)       unzip $1       ;;
+          *.zip)       unzip $1       ;;
+          *.war)       unzip $1       ;;
+          *.jar)       unzip $1       ;;
+          *.Z)         uncompress $1  ;;
+          *.7z)        7z x $1        ;;
+          *)           echo "don't know how to extract '$1'..." ;;
+      esac
+  else
+      echo "'$1' is not a valid file!"
+  fi
+}
+# easy compress - archive wrapper
+compress () {
+    if [ -n "$1" ] ; then
+        FILE=$1
+        case $FILE in
+        *.tar) shift && tar cf $FILE $* ;;
+        *.tar.bz2) shift && tar cjf $FILE $* ;;
+        *.tar.gz) shift && tar czf $FILE $* ;;
+        *.tgz) shift && tar czf $FILE $* ;;
+        *.zip) shift && zip $FILE $* ;;
+        *.rar) shift && rar $FILE $* ;;
+        esac
+    else
+        echo "usage: compress <foo.tar.gz> ./foo ./bar"
+    fi
+}
+#end of redguardtoo bashrc functions
+
+
+
 # some more ls aliases
 alias ll='ls -alF'
 alias la='ls -A'
 alias l='ls -CF'
+alias sl='ls'
 
 
 # Add an "alert" alias for long running commands.  Use like so:
@@ -127,23 +278,40 @@ function cl() { if $(test $# -gt 0); then cd $1; fi; if $(test $(ls | wc -l) -lt
 # alias ...="cl ../../.."
 alias sudo="sudo " #without this aliases aren't available when using sudo
 alias l="less"
+alias p='xclip -o'
 alias e="emacsclient --alternate-editor= -t"
 alias emacs="emacsclient --alternate-editor= -t"
+alias c="cal $(date '+%Y')"
 export EDITOR="emacsclient --alternate-editor= -t"
 # export GOPATH=$HOME/go
 # export ANDROID_HOME=$HOME/Files/android_dev/android-sdk-linux
 export PATH=$PATH:$HOME/Dropbox/misc_code/utils:$HOME/Dropbox/misc_code/utils/R:$GOPATH/bin:$ANDROID_HOME/platforms:$ANDROID_HOME/tools:$HOME/Files/play
-export PYTHONPATH=$PYTHONPATH:$HOME/Dropbox/misc_code/utils:$HOME/github/mysize_shopping/start_python
+export PYTHONPATH=$PYTHONPATH:$HOME/Dropbox/misc_code/utils:$HOME/github/mysize_shopping/start_python:$HOME/github/mysize_shopping/experimental/street2shop
 
 # export NVM_DIR="$HOME/.nvm"
 # [ -s "$NVM_DIR/nvm.sh" ] && source "$NVM_DIR/nvm.sh"  # This loads nvm
 
+function steam() { rm ~/.local/share/Steam/ubuntu12_32/steam-runtime/i386/usr/lib/i386-linux-gnu/libstdc++.so.6;
+                   rm ~/.local/share/Steam/ubuntu12_32/steam-runtime/i386/usr/lib/i386-linux-gnu/libgcc_s.so.1;
+                   steam;
+                 }
+
+function k() { ps aux | percol | awk '{ print $2 }' | xargs kill; }
+function psg() { ps -ef | grep "$1"; }
 function myip() { wget http://ipinfo.io/ip -qO -; }
 function geoip() { wget -qO - ipinfo.io/$1 | any2csv | plook -a; }
 function text() { curl http://textbelt.com/text -d number=$1 -d "message=$2"; }
 function textme() { text $PHONE_NUMBER $1; }
-function callme() { twilio_test.py -t $PHONE_NUMBERx; }
+function callme() { twilio_test.py -t $PHONE_NUMBER; }
 alias emailme="gmail.py -t $EMAIL_ADDRESS "
+function sshphone() { ssh -p 8022 -i ~/.ssh/jason-key-pair-useast.pem jtrigg@$1; }
+
+function wifi() { nmcli d wifi connect "$1" password "$2"; }
+function wifi_ls() { nmcli c; nmcli d wifi list; }
+function wifi_disconnect() { nmcli c down id "$1"; }
+function wifi_reset() { sudo service network-manager restart; }
+
+function img() { jp2a --colors "$1"  | less -r; }
 
 function wiki() { pywiki.py "$1" | html2text -utf8 | tr '\n' ' '; echo; }
 function define() { dict $1 | head -25; }
@@ -152,20 +320,31 @@ function debug() { set -o functrace; set -x; $("$@"); set +x; set +o functrace; 
 
 function mic() { amixer set Capture toggle; } # mute/unmute mic
 function b() { sudo bash -c "echo $1 > /sys/class/backlight/intel_backlight/brightness"; }
-function h() { grep -a $1 ~/.bash_history | tail; }
+function vu() { amixer -D pulse sset Master 5%+; }
+function vd() { amixer -D pulse sset Master 5%-; }
+# function h() { grep -a $1 ~/.bash_history | tail; }
 function kt() { pkill -9 -P $$; } #kill all children of this terminal
-function ff() { find ${2:-"."} -name '*'$1'*' | xargs -r ls -ltu | awk '{print $9}'; } #files with this name under this directory. 
-function ff1() { ff $1 | head -1; } #find most recently updated file with this name under this directory
-function gf() { grep -r -l -i $1 .; } #recursive grep for files containing the string in the current directory
+# function ff() { find ${2:-"."} -name '*'$1'*' | xargs -r ls -ltu | awk '{print $9}'; } #files with this name under this directory. 
+# function ff1() { ff $1 | head -1; } #find most recently updated file with this name under this directory
+# function gf() { grep -r -l -i $1 .; } #recursive grep for files containing the string in the current directory
 function xsh() { cat - | tr '\n' '\0' | xargs -r -0 -n1 bash -c; } #run each line of /dev/stdin in bash (-r so it doesn't crash on empty input)
 function ew() { emacs $(which $1); } #eg: ew inmypath.py
+function eb() { emacs $(readlink -f ~/.bashrc); }
+function sb() { source ~/.bashrc; }
 function echoerr() { echo "$@" 1>&2; } #echo, but to /dev/stderr
+
+function bigdir() { du / | pawk -g 'int(l.split()[0]) > 1e6' -p 'write_line(l.split())' | psort -c0 -n | less; } #find big directories on the system
+function dudir() { du -sc .[!.]* * |sort -h -r; }
 
 #git shortcuts
 function gl() { git diff HEAD~$1 HEAD; }
 function gp() { git stash; git pull --rebase; git stash apply; }
 function gg() { git log -p -S$1; }
 function sgrep() { git grep "$@" -- ':/' ':/!*thirdparty*' ':/!*data*'; }
+
+
+alias g="git"
+complete -o default -o nospace -F _git g
 #working directory = 1, staged = 2, committed = 3
 #these aliases copy your files from level i -> j for i,j in {1,2,3}
 alias g12="git add"
@@ -182,6 +361,9 @@ alias gd23="git diff --cached"
 alias gd31="git diff HEAD"
 alias gd21="git diff"
 alias gd32="git diff --cached"
+
+#startup ssh execute
+function sse() { ssh deploy@pants-me.com -t "$1"; }
 
 #startup mysql shortcuts
 export MYSQL_DB="start"
@@ -290,5 +472,12 @@ then
 fi
 
 
-
+#torch setup
 . /home/jtrigg/torch/install/bin/torch-activate
+export PATH=/usr/local/cuda/bin/:$PATH;
+export LD_LIBRARY_PATH=/usr/local/cuda/lib64/:$LD_LIBRARY_PATH; 
+export TIEFVISION_HOME=/home/jtrigg/github/tiefvision_dresses
+
+#tensorflow setup
+export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/usr/local/cuda/lib64:/usr/local/cuda/extras/CUPTI/lib64"
+export CUDA_HOME="/usr/local/cuda"
