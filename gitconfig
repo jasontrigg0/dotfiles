@@ -1,0 +1,17 @@
+[alias]
+        lol = log --graph --decorate --pretty=oneline --abbrev-commit
+        lola = log --graph --decorate --pretty=oneline --abbrev-commit --all
+[user]
+	email = jasontrigg0@gmail.com
+	name = jasontrigg0
+[core]
+	excludesfile = /home/jtrigg/.gitignore
+[multimailhook]
+	emailPrefix = [PantsMe Commit]
+[color]
+	ui = auto
+[diff]
+	renames = copies
+	mnemonicprefix = true
+[merge]
+	stat = true

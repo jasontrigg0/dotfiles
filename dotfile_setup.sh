@@ -6,7 +6,7 @@
 
 dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )" #this script's directory
 olddir=$(dirname $dir)/dotfiles_old #old dotfiles backup directory
-files="bashrc bash_profile emacs gitignore" #list of files/folders to symlink in homedir
+files="bashrc bash_profile emacs gitignore gitconfig" #list of files/folders to symlink in homedir
 
 
 # create dotfiles_old in homedir
