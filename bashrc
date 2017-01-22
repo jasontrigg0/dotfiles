@@ -19,6 +19,21 @@ shopt -s histappend
 HISTSIZE=250000
 HISTFILESIZE=250000
 
+promptFunc() {
+    # right before prompting for the next command, save the previous
+    # command in a file.
+    echo "$(date +%Y-%m-%d--%H-%M-%S) $(hostname) $PWD $(history 1)" \
+         >> ~/.full_history
+}
+
+#use trap DEBUG below instead of PROMPT_COMMAND or else the show-last-command-in-tab-name functionality breaks
+#write to bash_history after each command, also reload bash_history
+# export PROMPT_COMMAND='echo -ne "\033]0;$BASH_\007"; '
+export PROMPT_COMMAND='history -a; history -c; history -r; promptFunc'
+
+
+
+
 # check the window size after each command and, if necessary,
 # update the values of LINES and COLUMNS.
 shopt -s checkwinsize
@@ -115,6 +130,7 @@ function pclip() {
         fi
     fi
 }
+
 
 function h () {
     # reverse history, pick up one line, remove new line characters and put it into clipboard
@@ -236,11 +252,15 @@ compress () {
 
 
 # some more ls aliases
+alias copy='xclip -sel clip'
+alias paste='xclip -sel clip -o'
 alias ll='ls -alF'
 alias la='ls -A'
 alias l='ls -CF'
 alias sl='ls'
+function lsh { ls -ltu $1 | head; }
 
+alias o='xdg-open'
 
 # Add an "alert" alias for long running commands.  Use like so:
 #   sleep 10; alert
@@ -276,6 +296,7 @@ function cl() { if $(test $# -gt 0); then cd $1; fi; if $(test $(ls | wc -l) -lt
 # alias .="cl .."
 # alias ..="cl ../.."
 # alias ...="cl ../../.."
+
 alias sudo="sudo " #without this aliases aren't available when using sudo
 alias l="less"
 alias p='xclip -o'
@@ -296,13 +317,35 @@ function steam() { rm ~/.local/share/Steam/ubuntu12_32/steam-runtime/i386/usr/li
                    steam;
                  }
 
+function quote() {
+    #function from:
+    #https://www.jefftk.com/p/bash-argument-parsing-and-quoting
+
+    #related: good comments about quoting / variable expansion:
+    #http://stackoverflow.com/a/13819996
+    #http://unix.stackexchange.com/a/109074
+    first=true
+    for arg in "$@"; do
+        if $first; then first=false; else echo -n " "; fi
+        if echo "$arg" | grep -q '[^a-zA-Z0-9./_=-]'; then
+            arg="'$(echo "$arg" | sed -e 's~\\~\\\\~g' -e "s~'~\\\\'~g")'"
+        fi
+        echo -n "$arg"
+    done
+    echo
+}
+
+function unquote() { echo "$1" | xargs echo; }
+
 function k() { ps aux | percol | awk '{ print $2 }' | xargs kill; }
+function eg() { emacs $(ag -g $1 | percol); }
 function psg() { ps -ef | grep "$1"; }
 function myip() { wget http://ipinfo.io/ip -qO -; }
 function geoip() { wget -qO - ipinfo.io/$1 | any2csv | plook -a; }
 function text() { curl http://textbelt.com/text -d number=$1 -d "message=$2"; }
 function textme() { text $PHONE_NUMBER $1; }
 function callme() { twilio_test.py -t $PHONE_NUMBER; }
+function alarm() { echo "speaker-test -c2 -t sine -l1" | at $1; }
 alias emailme="gmail.py -t $EMAIL_ADDRESS "
 function sshphone() { ssh -p 8022 -i ~/.ssh/jason-key-pair-useast.pem jtrigg@$1; }
 
@@ -322,9 +365,10 @@ function mic() { amixer set Capture toggle; } # mute/unmute mic
 function b() { sudo bash -c "echo $1 > /sys/class/backlight/intel_backlight/brightness"; }
 function vu() { amixer -D pulse sset Master 5%+; }
 function vd() { amixer -D pulse sset Master 5%-; }
+function v() { amixer sset 'Master' ${1}%; }
 # function h() { grep -a $1 ~/.bash_history | tail; }
 function kt() { pkill -9 -P $$; } #kill all children of this terminal
-# function ff() { find ${2:-"."} -name '*'$1'*' | xargs -r ls -ltu | awk '{print $9}'; } #files with this name under this directory. 
+# function ff() { find ${2:-"."} -name '*'$1'*' | xargs -r ls -ltu | awk '{print $9}'; } #files with this name under this directory.
 # function ff1() { ff $1 | head -1; } #find most recently updated file with this name under this directory
 # function gf() { grep -r -l -i $1 .; } #recursive grep for files containing the string in the current directory
 function xsh() { cat - | tr '\n' '\0' | xargs -r -0 -n1 bash -c; } #run each line of /dev/stdin in bash (-r so it doesn't crash on empty input)
@@ -337,11 +381,19 @@ function bigdir() { du / | pawk -g 'int(l.split()[0]) > 1e6' -p 'write_line(l.sp
 function dudir() { du -sc .[!.]* * |sort -h -r; }
 
 #git shortcuts
-function gl() { git diff HEAD~$1 HEAD; }
-function gp() { git stash; git pull --rebase; git stash apply; }
+function gs() { git status; }
+function gl() {
+    if [ -n "$1" ]
+    then
+        git diff $1~ $1;
+    else
+        git diff HEAD~ HEAD;
+    fi
+}
+function gp() { git stash && git pull --rebase && git stash apply; }
 function gg() { git log -p -S$1; }
 function sgrep() { git grep "$@" -- ':/' ':/!*thirdparty*' ':/!*data*'; }
-
+# git log -p -M --follow --stat -- js/cloth/cloth.js
 
 alias g="git"
 complete -o default -o nospace -F _git g
@@ -351,9 +403,9 @@ alias g12="git add"
 alias g13="git commit"
 #No easy way to commit a single staged file
 #alias g23="git commit"
-alias g21="git checkout --"
+alias g21="confirm git checkout --"
 alias g32="git reset --"
-alias g31="git checkout HEAD --"
+alias g31="confirm git checkout HEAD --"
 alias gd="git diff"
 alias gd13="git diff HEAD"
 alias gd12="git diff"
@@ -361,6 +413,19 @@ alias gd23="git diff --cached"
 alias gd31="git diff HEAD"
 alias gd21="git diff"
 alias gd32="git diff --cached"
+
+#prompt the user before running a command
+#http://askubuntu.com/a/22257
+confirm() {
+    echo -n "Are you sure you want to run '$*'? [N/y] "
+    read -N 1 REPLY
+    echo
+    if test "$REPLY" = "y" -o "$REPLY" = "Y"; then
+        "$@"
+    else
+        echo "Cancelled by user"
+    fi
+}
 
 #startup ssh execute
 function sse() { ssh deploy@pants-me.com -t "$1"; }
@@ -391,11 +456,12 @@ function blacklist() { db 'UPDATE start.product_sources ps SET ps.blacklist = 1 
 function blacklist_sibs() { db 'UPDATE start.product_sources ps JOIN start.product_sources ps2 ON ps.parent_id = ps2.parent_id SET ps.blacklist = 1 WHERE ps2.external_id = "'$1'" OR ps2.variation_id = "'$1'"'; }
 function blacklist_merge() { db 'DELETE pv FROM start.product_variations pv INNER JOIN start.product_sources ps ON ps.variation_id = pv.id WHERE (ps.blacklist OR ps.blacklist_score > 0.5)'; }
 
-function asin() { google-chrome "http://www.amazon.com/dp/$1"; 
+function asin() { google-chrome "http://www.amazon.com/dp/$1";
 }
 function offers() { db 'SELECT pso.* FROM start.product_sources ps LEFT JOIN start.product_variations pv ON ps.variation_id = pv.id LEFT JOIN start.product_source_offers pso ON pso.source_id = ps.id and pso.origin_id = ps.origin_id WHERE ps.external_id = "'$1'"'; }
 
 MS_DIR=$HOME/github/mysize_shopping;
+
 
 function color() { $MS_DIR/start_python/start/augment_jeans/process_image.py --asin "$1"; $MS_DIR/start_python/start/augment_jeans/main.py --sibling_variation "$1"; }
 
@@ -418,11 +484,13 @@ function watch_python() { find . -name '*.py' | entr sh -c 'sudo python '$PWD'/s
 
 function fix_numpy() { less /var/lib/dpkg/status | pawk -b 'x=0' -p 'if "Package:" in l: x = "python-rdkit" in l;' 'if x and l.startswith("Depends:"): write_line([x for x in r if not "numpy" in x]); else: print l' > /tmp/test.txt; }
 
-
-#use trap DEBUG below instead of PROMPT_COMMAND or else the show-last-command-in-tab-name functionality breaks
-#write to bash_history after each command, also reload bash_history
-# export PROMPT_COMMAND='echo -ne "\033]0;$BASH_\007"; '
-# export PROMPT_COMMAND='history -a; history -c; history -r;'
+weather() {
+    key=8b88e7d846a8fd02;
+    echo NYC:
+    echo ''
+    data=$(curl -s "http://api.wunderground.com/api/$key/forecast/q/NY/New_York.json" | jq -r ['.forecast.txt_forecast.forecastday[] | [.title], [.fcttext], ["break"] | .[]'])
+    echo $data | sed -e 's/[,]/\n/g' -e 's/[]"]/''/g' -e 's/[[]/''/g' -e 's/break/\n/g'
+}
 
 
 #handling for multiline commands (breaks if using "history -c; history -r" in PROMPT_COMMAND above)
@@ -459,25 +527,28 @@ function dep() {
 #show previous command in tab name
 #http://www.davidpashley.com/articles/xterm-titles-with-bash/
 #keep this at the end of the file or else running the bashrc commands will change the starting tab title
-if [ "$SHELL" = '/bin/bash' ]
-then
-    case $TERM in
-        rxvt|xterm-256color)
-            #leaving functrace on causes the terminal to freak out on tab completion
-            # set -o functrace 
-            trap 'echo -ne "\e]0;"; echo -n $BASH_COMMAND | cmd_summary.py; echo -ne "\007"; history -a; history -c; history -r;' DEBUG
-            # trap 'PREV_CMD=$CURR_CMD; CURR_CMD=$BASH_COMMAND' DEBUG
-         ;;
-    esac
-fi
+# if [ "$SHELL" = '/bin/bash' ]
+# then
+#     case $TERM in
+#         rxvt|xterm-256color)
+#             #leaving functrace on causes the terminal to freak out on tab completion
+#             # set -o functrace
+#             trap 'echo -ne "\e]0;"; echo -n $BASH_COMMAND | cmd_summary.py; echo -ne "\007"; history -a; history -c; history -r;' DEBUG
+#             # trap 'PREV_CMD=$CURR_CMD; CURR_CMD=$BASH_COMMAND' DEBUG
+#          ;;
+#     esac
+# fi
 
 
 #torch setup
 . /home/jtrigg/torch/install/bin/torch-activate
 export PATH=/usr/local/cuda/bin/:$PATH;
-export LD_LIBRARY_PATH=/usr/local/cuda/lib64/:$LD_LIBRARY_PATH; 
+export LD_LIBRARY_PATH=/usr/local/cuda/lib64/:$LD_LIBRARY_PATH;
 export TIEFVISION_HOME=/home/jtrigg/github/tiefvision_dresses
 
 #tensorflow setup
 export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/usr/local/cuda/lib64:/usr/local/cuda/extras/CUPTI/lib64"
 export CUDA_HOME="/usr/local/cuda"
+
+#start cloth simulation
+function cloth() { cd /home/jtrigg/github/mysize_shopping/experimental/cloth; (python -m SimpleHTTPServer 31014 &); while [ 1 ]; do gulp; sleep 3; done; }
