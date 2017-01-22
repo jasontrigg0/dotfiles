@@ -35,6 +35,13 @@ then
     ln -s $dir/sshconfig ~/.ssh/config
 fi
 
+#setup .i3 config
+if [ -f "$dir/i3config" ]
+then
+    mv ~/.i3/config $olddir
+    ln -s $dir/i3config ~/.i3/config
+fi
+
 
 #setup .emacs.d directory
 #http://www.lingotrek.com/2010/12/integrating-emacs-with-x11-clipboard-in.html
