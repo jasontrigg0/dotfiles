@@ -1,5 +1,57 @@
-;;to reload this file: 
+;;to reload this file:
 ;;M-x load-file and then enter twice
+
+;; I know that string is in my Emacs somewhere!
+;;http://stackoverflow.com/a/2642655
+;; (require 'cl)
+;; (defcustom search-all-buffers-ignored-files (list (rx-to-string '(and bos (or ".bash_history" "TAGS") eos)))
+;;   "Files to ignore when searching buffers via \\[search-all-buffers]."
+;;   :type 'editable-list)
+
+;; (require 'grep)
+;; (defun search-all-buffers (regexp prefix)
+;;   "Searches file-visiting buffers for occurence of REGEXP.  With
+;; prefix > 1 (i.e., if you type C-u \\[search-all-buffers]),
+;; searches all buffers."
+;;   (interactive (list (grep-read-regexp)
+;;                      current-prefix-arg))
+;;   (message "Regexp is %s; prefix is %s" regexp prefix)
+;;   (multi-occur
+;;    (if (member prefix '(4 (4)))
+;;        (buffer-list)
+;;      (remove-if
+;;       (lambda (b) (some (lambda (rx) (string-match rx  (file-name-nondirectory (buffer-file-name b)))) search-all-buffers-ignored-files))
+;;       (remove-if-not 'buffer-file-name (buffer-list))))
+
+;;    regexp))
+
+;; (global-set-key [f7] 'search-all-buffers)
+
+
+;; search in all open buffers
+;; (defun my-multi-occur-in-matching-buffers (regexp &optional allbufs)
+;;   "Show all lines matching REGEXP in all buffers."
+;;   (interactive (occur-read-primary-args))
+;;   (multi-occur-in-matching-buffers ".*" regexp))
+;; (global-set-key (kbd "M-s /") 'my-multi-occur-in-matching-buffers)
+
+(global-set-key (kbd "M-s /") 'ag-project)
+
+
+;;remove all trailing whitespace before saving file
+(add-hook 'before-save-hook 'delete-trailing-whitespace)
+
+;; Automatically save and restore sessions
+(setq desktop-dirname             "~/.emacs.d/desktop/"
+      desktop-base-file-name      "emacs.desktop"
+      desktop-base-lock-name      "lock"
+      desktop-path                (list desktop-dirname)
+      desktop-save                t
+      desktop-files-not-to-save   "^$" ;reload tramp paths
+      desktop-auto-save-timeout   300
+      desktop-restore-eager 5
+      desktop-load-locked-desktop nil)
+(desktop-save-mode 1)
 
 ;MELPA package archive
 (when (>= emacs-major-version 24)
@@ -15,6 +67,10 @@
 (setq-default indent-tabs-mode nil)
 (setq tab-width 4)
 
+
+;2 spaces for js
+(setq js-indent-level 2)
+(setq css-indent-offset 2)
 
 ;emacs-copy also copies + pastes to/from the clipboard
 ;possibly requires installing xclip 1.3 in emacs24 also?
@@ -65,7 +121,7 @@
   (shift-region -1))
 
 ;; Bind (shift-right) and (shift-left) function to your favorite keys. I use
-;; the following so that Ctrl-Shift-Right Arrow moves selected text one 
+;; the following so that Ctrl-Shift-Right Arrow moves selected text one
 ;; column to the right, Ctrl-Shift-Left Arrow moves selected text one
 ;; column to the left:
 (global-set-key [C-S-right] 'shift-right)
@@ -104,7 +160,7 @@
           (shell-command (concat "chmod u+x " new-name)))))))
 
 
-;automatically create intermediate directories when opening new files 
+;automatically create intermediate directories when opening new files
 (defadvice find-file (before make-directory-maybe (filename &optional wildcards) activate)
   "Create parent directory if not exists while visiting file."
   (unless (file-exists-p filename)
@@ -128,14 +184,12 @@
       (setq alist (cdr alist)))))
 (add-hook 'find-file-hook 'setup-comment-based-on-extension)
 
-
-
 ;setup files with certain endings to open in the proper mode
 ;(single quote matches end-of-string)
 (add-to-list 'auto-mode-alist '("\\emacs\\'" . emacs-lisp-mode))
 (add-to-list 'auto-mode-alist '("\\.scss\\'" . css-mode))
 (add-to-list 'auto-mode-alist '("\\ashrc\\'" . sh-mode)) ;HACK: for some reason including the b in "bashrc" here doesn't work??
-
+(add-to-list 'auto-mode-alist '("\\.ses\\'" . ses-mode))
 
 ;mode for js inside html
 (require 'web-mode)
@@ -215,7 +269,7 @@ Position the cursor at it's beginning, according to the current mode."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ '(ag-arguments (quote ("--smart-case" "--stats" "-A 5" "-B 5"))))
 
 (defun module_fns ()
   (interactive)
@@ -223,5 +277,5 @@ Position the cursor at it's beginning, according to the current mode."
   (elpy-occur-definitions)
   (other-window 1)
   (previous-buffer))
-  
+
 (global-set-key (kbd "C-c C-a") 'module_fns)
