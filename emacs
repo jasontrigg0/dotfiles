@@ -51,7 +51,19 @@
       desktop-auto-save-timeout   300
       desktop-restore-eager 5
       desktop-load-locked-desktop nil)
-(desktop-save-mode 1)
+
+;;bugfix for desktop-restore with daemon mode
+;;https://www.reddit.com/r/emacs/comments/3t5zqs/daemon_mode_with_desktopsavemode/cx3e0ps/
+;; Enable desktop-save-mode only when the first frame has come up.
+;; This prevents Emacs from stalling when run as a daemon.
+(add-hook 'after-make-frame-functions
+    (lambda (frame)
+        (with-selected-frame frame
+            (unless desktop-save-mode
+                ;; http://debbugs.gnu.org/cgi/bugreport.cgi?bug=17693
+                (if (daemonp) (setq desktop-restore-frames nil))
+                (desktop-save-mode 1)
+                (desktop-read)))))
 
 ;MELPA package archive
 (when (>= emacs-major-version 24)
