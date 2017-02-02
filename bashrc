@@ -348,6 +348,10 @@ function callme() { twilio_test.py -t $PHONE_NUMBER; }
 function alarm() { echo "speaker-test -c2 -t sine -l1" | at $1; }
 alias emailme="gmail.py -t $EMAIL_ADDRESS "
 function sshphone() { ssh -p 8022 -i ~/.ssh/jason-key-pair-useast.pem jtrigg@$1; }
+function scantopdf() {
+    #use scanimage -L to find device name and then insert in -d flag below
+    scanimage --resolution 200 --format=tiff -d 'hpaio:/usb/ENVY_4520_series?serial=TH5AO3D21T0660' | convert tiff:- -quality 40 -compress jpeg pdf:-;
+}
 
 function wifi() { nmcli d wifi connect "$1" password "$2"; }
 function wifi_ls() { nmcli c; nmcli d wifi list; }
