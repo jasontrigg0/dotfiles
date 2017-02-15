@@ -1,6 +1,6 @@
 ;;to reload this file:
 ;;M-x load-file and then enter twice
-
+;;
 ;; I know that string is in my Emacs somewhere!
 ;;http://stackoverflow.com/a/2642655
 ;; (require 'cl)
@@ -80,9 +80,14 @@
 (setq tab-width 4)
 
 
-;2 spaces for js
+;2 spaces for js, web-mode
 (setq js-indent-level 2)
 (setq css-indent-offset 2)
+
+;http://web-mode.org/
+(setq web-mode-code-indent-offset 2)
+(setq web-mode-markup-indent-offset 2)
+(setq web-mode-css-indent-offset 2)
 
 ;emacs-copy also copies + pastes to/from the clipboard
 ;possibly requires installing xclip 1.3 in emacs24 also?
@@ -206,6 +211,7 @@
 ;mode for js inside html
 (require 'web-mode)
 (add-to-list 'auto-mode-alist '("\\.html$" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.jsx\\'" . web-mode))
 
 ;;set by customize-face:
 (custom-set-faces
