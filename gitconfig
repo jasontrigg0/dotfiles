@@ -18,6 +18,7 @@
 	stat = true
 [mergetool.ediff]
     #http://stackoverflow.com/a/1818855
+    #adding desktop-save-mode 0 to keep the new instance from prompting about saving
     cmd = emacs --eval \"\
     (progn\
       (defun ediff-write-merge-buffer ()\
@@ -28,6 +29,7 @@
           (set-buffer-modified-p nil)\
           (sit-for 1)))\
       (setq ediff-quit-hook 'kill-emacs\
-            ediff-quit-merge-hook 'ediff-write-merge-buffer)\
+            ediff-quit-merge-hook 'ediff-write-merge-buffer\
+            desktop-save-mode 0)\
       (ediff-merge-files-with-ancestor \\\"$LOCAL\\\" \\\"$REMOTE\\\"\
                                        \\\"$BASE\\\" nil \\\"$MERGED\\\"))\"
