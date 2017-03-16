@@ -14,7 +14,7 @@ sudo easy_install matplotlib
 sudo easy_install sklearn
 sudo easy_install csvkit
 
-
+#numpy scipy pandas
 sudo apt-get install libblas-dev liblapack-dev libatlas-base-dev gfortran
 sudo pip install numpy
 sudo pip install scipy
@@ -27,6 +27,13 @@ sudo pip install MySQL-python
 sudo easy_install sqlalchemy
 sudo easy_install pymysql
 
+#ag
+sudo apt-get install silversearcher-ag
+
+sudo apt-get install gyazo
+sudo apt-get install i3
+sudo apt-get install jp2a
+
 #phantomjs
 sudo apt-get install build-essential chrpath libssl-dev libxft-dev
 sudo apt-get install libfreetype6 libfreetype6-dev
@@ -37,3 +44,6 @@ wget https://bitbucket.org/ariya/phantomjs/downloads/$PHANTOM_JS.tar.bz2
 sudo tar xvjf $PHANTOM_JS.tar.bz2
 sudo mv $PHANTOM_JS /usr/local/share
 sudo ln -sf /usr/local/share/$PHANTOM_JS/bin/phantomjs /usr/local/bin
+
+#concat pdfs
+sudo apt-get install pdftk
