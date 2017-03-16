@@ -8,30 +8,7 @@
 #       *) return;;
 # esac
 
-# don't put duplicate lines or lines starting with space in the history.
-# See bash(1) for more options
-HISTCONTROL=ignoreboth
-
-# append to the history file, don't overwrite it
-shopt -s histappend
-
-# for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
-HISTSIZE=250000
-HISTFILESIZE=250000
-
-promptFunc() {
-    # right before prompting for the next command, save the previous
-    # command in a file.
-    echo "$(date +%Y-%m-%d--%H-%M-%S) $(hostname) $PWD $(history 1)" \
-         >> ~/.full_history
-}
-
 #use trap DEBUG below instead of PROMPT_COMMAND or else the show-last-command-in-tab-name functionality breaks
-#write to bash_history after each command, also reload bash_history
-# export PROMPT_COMMAND='echo -ne "\033]0;$BASH_\007"; '
-export PROMPT_COMMAND='history -a; history -c; history -r; promptFunc'
-
-
 
 
 # check the window size after each command and, if necessary,
@@ -101,38 +78,74 @@ if [ -x /usr/bin/dircolors ]; then
 fi
 
 
-#keep ctrl+s from freezing terminal window:
-#http://unix.stackexchange.com/a/12108
-stty -ixon
+# Alias definitions.
+# You may want to put all your additions into a separate file like
+# ~/.bash_aliases, instead of adding them here directly.
+# See /usr/share/doc/bash-doc/examples in the bash-doc package.
 
-#from this guy's cool bashrc:
-#https://gist.github.com/redguardtoo/01868d7a13817c9845e8#file-bashrc
-GREPCMD="grep -rsnI --exclude=*.log --exclude=*.properties --exclude=TAGS --exclude=tags --exclude=GTAGS --exclude-dir=.svn --exclude-dir=bower_components --exclude-dir=node_modules --exclude-dir=dist --exclude-dir=.sass-cache --exclude-dir=.cache  --exclude-dir=.cvs --exclude-dir=.git --exclude-dir=test --exclude-dir=tests --exclude-dir=.hg --exclude-dir=.metadata --exclude-dir=logs --exclude=#*# --exclude=*.swp --exclude=*.min.js --exclude=*.min.css --exclude=*~ --color=auto"
+if [ -f ~/.bash_aliases ]; then
+    source ~/.bash_aliases
+fi
 
-function a () {
-    $GREPCMD "$@"
-}
+#load private info like email, phone, etc (things I don't want to put on github)
+if [ -f ~/.bash_private ]; then
+    source ~/.bash_private
+fi
 
-function pclip() {
-    if [ "$OS_NAME" ==  "CYGWIN" ]; then
-        putclip $@;
-    elif [ "$OS_NAME" == "Darwin" ]; then
-        pbcopy $@;
-    else
-        if [ -x /usr/bin/xsel ]; then
-            xsel -ib $@;
-        else
-            if [ -x /usr/bin/xclip ]; then
-                xclip -selection c $@;
-            else
-                echo "Neither xsel or xclip is installed!"
-            fi
-        fi
-    fi
+# enable programmable completion features (you don't need to enable
+# this, if it's already enabled in /etc/bash.bashrc and /etc/profile
+# sources /etc/bash.bashrc).
+if ! shopt -oq posix; then
+  if [ -f /usr/share/bash-completion/bash_completion ]; then
+    source /usr/share/bash-completion/bash_completion
+  elif [ -f /etc/bash_completion ]; then
+    source /etc/bash_completion
+  fi
+fi
+
+
+
+
+###########################
+
+
+#####
+# bash history setup
+#####
+# don't put duplicate lines or lines starting with space in the history.
+# See bash(1) for more options
+HISTCONTROL=ignoreboth
+
+
+###
+#PROMPT_COMMAND is run after each command:
+###
+#write to bash_history after each command, also reload bash_history
+export PROMPT_COMMAND='history -a; history -c; history -r; promptFunc'
+#history -a: append from this tab's history to the history file
+#history -c: clear this tab's history
+#history -r: read the history file as this tab's history (ie sync with other tabs)
+#promptFunc: Jeff Kaufman's function to log and save command (see below)
+
+# When the shell exits, append to the history file instead of overwriting it
+shopt -s histappend
+
+# set .bash_history to a long length
+HISTSIZE=250000
+HISTFILESIZE=250000
+
+# https://www.jefftk.com/p/you-should-be-logging-shell-history
+# add logging information and write to .full_history
+promptFunc() {
+    # right before prompting for the next command, save the previous
+    # command in a file.
+    echo "$(date +%Y-%m-%d--%H-%M-%S) $(hostname) $PWD $(history 1)" \
+         >> ~/.full_history
 }
 
 
 function h () {
+    #https://gist.github.com/redguardtoo/01868d7a13817c9845e8#file-bashrc
     # reverse history, pick up one line, remove new line characters and put it into clipboard
     if [ -z "$1" ]; then
         echo "Usage: h keyword [-v]"
@@ -142,69 +155,28 @@ function h () {
     fi
 }
 
-# search the file and pop up dialog, then put the full path in clipboard
-function baseff()
-{
-    local fullpath=$*
-    local filename=${fullpath##*/} # remove "/" from the beginning
-    filename=${filename##*./} # remove  ".../" from the beginning
-    #  only the filename without path is needed
-    # filename should be reasonable
-    local cli=`find . -not -iwholename '*/.gradle/*' -not -iwholename '*/dist/*' -not -iwholename '*.class' -not -iwholename '*.elc' -not -iwholename '*.pyc' -not -iwholename '*/vendor/*' -not -iwholename '*/bower_components/*' -not -iwholename '*/node_modules/*' -not -iwholename '*/target/*' -not -iwholename '*.svn*' -not -iwholename '*.git*' -not -iwholename '*.sass-cache*' -not -iwholename '*.hg*' -type f -path '*'${filename}'*' -print | percol`
-    # convert relative path to full path
-    echo $(cd $(dirname $cli); pwd)/$(basename $cli)
-}
 
-# find a file and copy its *nix directory (without filename) into clipboard
-# cd into that directory at the same time
-function ffcd()
-{
-    local cli=`baseff $*`
-    local dir=$(dirname "${cli}")
-    cd ${dir} && echo ${dir}
-    echo -n ${cli} | pclip
-}
 
-# find a file and copy its *nix full path into clipboard
-function ff()
-{
-    local cli=`baseff $*`
-    #echo ${cli} | sed 's%^'${HOME}'%~%'
-    #echo -n ${cli}  | sed 's%^'${HOME}'%~%' | pclip
-    echo ${cli}
-    echo -n ${cli} | pclip
-}
 
-#find a file and emacs that file
-function ffe() {
-    local cli=$(baseff $*)
-    echo -n ${cli} | pclip
-    e ${cli}
-}
+#####
+# specific fixes
+#####
 
-function gf()
-{
-    # @see http://stackoverflow.com/questions/13373249/extract-substring-using-regexp-in-plain-bash
-    local fullpath=$*
-    local filename=${fullpath##*/}
-    local filter=${fullpath##*./}
+#keep ctrl+s from freezing terminal window:
+#http://unix.stackexchange.com/a/12108
+stty -ixon
 
-    # only the filename without path is needed
-    # filename should be reasonable
-    local cli=`find $(git rev-parse --show-toplevel) -not -iwholename '*.svn*' -not -iwholename '*.git*' -not -iwholename '*.sass-cache*' -not -iwholename '*.hg*' -type f -iname '*'${filename}'*' -print | grep ${filter} | percol`
-    echo ${cli}
-    echo -n ${cli} | pclip;
-}
+#make aliases available when using sudo
+alias sudo="sudo "
 
-# find file containing string
-function fs()
-{
-    local cli=`${GREPCMD} -l $* $PWD/*| percol`
-    echo -n ${cli} | pclip;
-    echo ${cli}
-}
 
-# Easy extact
+
+######
+## compression
+######
+
+# Easy extract -- move file into a new (empty folder) before extracting
+#https://gist.github.com/redguardtoo/01868d7a13817c9845e8#file-bashrc
 extract () {
   if [ -f $1 ] ; then
       case $1 in
@@ -247,63 +219,221 @@ compress () {
         echo "usage: compress <foo.tar.gz> ./foo ./bar"
     fi
 }
-#end of redguardtoo bashrc functions
 
 
 
-# some more ls aliases
-alias copy='xclip -sel clip'
-alias paste='xclip -sel clip -o'
+#############
+# ls / navigation
+#############
+
 alias ll='ls -alF'
 alias la='ls -A'
 alias l='ls -CF'
 alias sl='ls'
 function lsh { ls -ltu $1 | head; }
-
-alias o='xdg-open'
-
-# Add an "alert" alias for long running commands.  Use like so:
-#   sleep 10; alert
-alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
-
-# Alias definitions.
-# You may want to put all your additions into a separate file like
-# ~/.bash_aliases, instead of adding them here directly.
-# See /usr/share/doc/bash-doc/examples in the bash-doc package.
-
-if [ -f ~/.bash_aliases ]; then
-    source ~/.bash_aliases
-fi
-
-#load private info like email, phone, etc (things I don't want to put on github)
-if [ -f ~/.bash_private ]; then
-    source ~/.bash_private
-fi
-
-# enable programmable completion features (you don't need to enable
-# this, if it's already enabled in /etc/bash.bashrc and /etc/profile
-# sources /etc/bash.bashrc).
-if ! shopt -oq posix; then
-  if [ -f /usr/share/bash-completion/bash_completion ]; then
-    source /usr/share/bash-completion/bash_completion
-  elif [ -f /etc/bash_completion ]; then
-    source /etc/bash_completion
-  fi
-fi
-
-
 function cl() { if $(test $# -gt 0); then cd $1; fi; if $(test $(ls | wc -l) -lt 200); then ls; fi; }
 # alias .="cl .."
 # alias ..="cl ../.."
 # alias ...="cl ../../.."
 
-alias sudo="sudo " #without this aliases aren't available when using sudo
+
+
+#############
+# copy/paste
+#############
+
+alias copy='xclip -sel clip'
+alias paste='xclip -sel clip -o'
+#note: more
+#https://gist.github.com/redguardtoo/01868d7a13817c9845e8#file-bashrc
+
+
+############
+# open / emacs
+############
+
+function o () { #open an arbitrary file
+    xdg-open "$@" > /dev/null 2>&1 &
+}
+function img() { jp2a --colors "$1"  | less -r; } #show jpg in the terminal
+function dl {
+    #open last downloaded file
+    f=$(ls -A1u ~/Downloads/ | head -1); o ~/Downloads/"$f";
+}
+
 alias l="less"
-alias p='xclip -o'
 alias e="emacsclient --alternate-editor= -t"
 alias emacs="emacsclient --alternate-editor= -t"
-alias c="cal $(date '+%Y')"
 export EDITOR="emacsclient --alternate-editor= -t"
+
+function eb() { emacs $(readlink -f ~/.bashrc); }
+function sb() { source ~/.bashrc; }
+function ew() { emacs $(which $1); } #eg: ew inmypath.py
+function eg() { emacs $(ag -g $1 | percol); }
+
+
+
+
+########
+# handle processes
+########
+
+function k() { ps aux | percol | awk '{ print $2 }' | xargs kill; }
+function psg() { ps -ef | grep "$1"; }
+function kt() { pkill -9 -P $$; } #kill all children of this terminal
+
+
+#######
+# communication
+#######
+function text() { curl http://textbelt.com/text -d number=$1 -d "message=$2"; }
+function textme() { text $PHONE_NUMBER $1; }
+function callme() { twilio_test.py -t $PHONE_NUMBER; }
+alias emailme="gmail.py -t $EMAIL_ADDRESS "
+
+
+#######
+# wifi
+#######
+
+function wifi() { nmcli d wifi connect "$1" password "$2"; }
+function wifi_ls() { nmcli c; nmcli d wifi list; }
+function wifi_disconnect() { nmcli c down id "$1"; }
+function wifi_reset() { sudo service network-manager restart; }
+
+
+
+########
+# lookup info
+#######
+
+alias c="cal $(date '+%Y')"
+function myip() { wget http://ipinfo.io/ip -qO -; }
+function geoip() { wget -qO - ipinfo.io/$1 | any2csv | plook -a; }
+function wiki() { pywiki.py "$1" | html2text -utf8 | tr '\n' ' '; echo; }
+function define() { dict $1 | head -25; }
+function weather() {
+    key=8b88e7d846a8fd02;
+    echo NYC:
+    echo ''
+    data=$(curl -s "http://api.wunderground.com/api/$key/forecast/q/NY/New_York.json" | jq -r ['.forecast.txt_forecast.forecastday[] | [.title], [.fcttext], ["break"] | .[]'])
+    echo $data | sed -e 's/[,]/\n/g' -e 's/[]"]/''/g' -e 's/[[]/''/g' -e 's/break/\n/g'
+}
+
+
+
+#######
+# running bash / terminal commands
+#######
+function debug() { set -o functrace; set -x; $("$@"); set +x; set +o functrace; }
+function xsh() { cat - | tr '\n' '\0' | xargs -r -0 -n1 bash -c; } #run each line of /dev/stdin in bash (-r so it doesn't crash on empty input)
+function echoerr() { echo "$@" 1>&2; } #echo, but to /dev/stderr
+
+#fzf for searching history
+#https://github.com/junegunn/fzf
+#(includes uninstall script if I don't like it)
+[ -f ~/.fzf.bash ] && source ~/.fzf.bash
+
+
+#######
+# machine maintenance
+#######
+function bigdir() { du / | pawk -g 'int(l.split()[0]) > 1e6' -p 'write_line(l.split())' | psort -c0 -n | less; } #find big directories on the system
+function dudir() { du -sc .[!.]* * |sort -h -r; }
+function space_check() {
+    sudo du -m --max-depth=4 / | sort -nr | head -n 20;
+}
+
+
+
+##################
+# git
+#################
+
+####setup a new github repository
+function github_repo() {
+    curl -u 'jasontrigg0' https://api.github.com/user/repos -d '{"name":"'$1'"}'
+    git init
+    git add .
+    git commit -m 'Initial commit'
+    git remote add origin git@github.com:jasontrigg0/$1.git
+    #sometimes this might help?
+    #git remote set-url origin git@github.com:jasontrigg0/$1.git
+    git push -u origin master
+}
+
+alias g="git"
+complete -o default -o nospace -F _git g
+#working directory = 1, staged = 2, committed = 3
+#these aliases copy your files from level i -> j for i,j in {1,2,3}
+alias g12="git add"
+alias g13="git commit"
+#No easy way to commit a single staged file
+#alias g23="git commit"
+alias g21="confirm git checkout --"
+alias g32="git reset --"
+alias g31="confirm git checkout HEAD --"
+alias gd="git diff"
+alias gd13="git diff HEAD"
+alias gd12="git diff"
+alias gd23="git diff --cached"
+alias gd31="git diff HEAD"
+alias gd21="git diff"
+alias gd32="git diff --cached"
+
+#git shortcuts
+function gs() { git status; }
+function gl() {
+    if [ -n "$1" ]
+    then
+        git diff $1~ $1;
+    else
+        git diff HEAD~ HEAD;
+    fi
+}
+function gp() { git stash && git pull --rebase && git stash apply; }
+function gg() { git log -p -S$1; }
+function sgrep() { git grep "$@" -- ':/' ':/!*thirdparty*' ':/!*data*'; }
+
+
+
+
+
+
+######################
+#commandline mysql
+#####################
+
+export MYSQL_DB="start"
+export MYSQL_HOST="pants-me.com"
+function tables() { db "show tables from start" | cat; }
+function dbi() { db -i "$1" | cat; }
+function dbd() { db -d "$1" | cat; }
+function dbc() { db --cat "$1"; }
+function dbh() { db --head "$1"; }
+function dbt() { db --tail "$1"; }
+function dbw() { dbtp -w "$@"; }
+function dbk() { db -r --key "$@" | ptr | plook -a -n; }
+function dbtp() { db -r "$@" | ptr | plook -a -n; }
+
+
+
+##############
+# multiline commands
+###############
+
+#handling for multiline commands (breaks if using "history -c; history -r" in PROMPT_COMMAND above)
+# shopt -s cmdhist lithist
+
+#PS2 is the prompt for multiline commands (defaults to ">")
+PS2=""
+
+
+
+#################
+## miscellaneous
+################
+
 # export GOPATH=$HOME/go
 # export ANDROID_HOME=$HOME/Files/android_dev/android-sdk-linux
 export PATH=$PATH:$HOME/Dropbox/misc_code/utils:$HOME/Dropbox/misc_code/utils/R:$GOPATH/bin:$ANDROID_HOME/platforms:$ANDROID_HOME/tools:$HOME/Files/play
@@ -316,6 +446,57 @@ function steam() { rm ~/.local/share/Steam/ubuntu12_32/steam-runtime/i386/usr/li
                    rm ~/.local/share/Steam/ubuntu12_32/steam-runtime/i386/usr/lib/i386-linux-gnu/libgcc_s.so.1;
                    steam;
                  }
+
+# Add an "alert" alias for long running commands.  Use like so:
+#   sleep 10; alert
+function sshphone() { ssh -p 8022 -i ~/.ssh/jason-key-pair-useast.pem jtrigg@$1; }
+function alarm() { echo "speaker-test -c2 -t sine -l1" | at $1; }
+function scantopdf() {
+    #use scanimage -L to find device name and then insert in -d flag below
+    device_name=$(scanimage -L | pawk -g 'l and (not "queue=false" in l)' -p 'print l.split()[1][1:-1]')
+    scanimage --resolution 200 --format=tiff -d "$device_name" | convert tiff:- -quality 40 -compress jpeg pdf:-;
+}
+function catpdfs() {
+    pdftk "$@" cat output -;
+}
+function mic() { amixer set Capture toggle; } # mute/unmute mic
+alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
+function serve {
+    PORT_NUMBER=${1:-8000};
+    python -m SimpleHTTPServer $PORT_NUMBER;
+}
+
+#prompt the user before running a command
+#http://askubuntu.com/a/22257
+confirm() {
+    echo -n "Are you sure you want to run '$*'? [N/y] "
+    read -N 1 REPLY
+    echo
+    if test "$REPLY" = "y" -o "$REPLY" = "Y"; then
+        "$@"
+    else
+        echo "Cancelled by user"
+    fi
+}
+
+function watch_python() { find . -name '*.py' | entr sh -c 'sudo python '$PWD'/setup.py install > /dev/null' & }
+
+function fix_numpy() { less /var/lib/dpkg/status | pawk -b 'x=0' -p 'if "Package:" in l: x = "python-rdkit" in l;' 'if x and l.startswith("Depends:"): write_line([x for x in r if not "numpy" in x]); else: print l' > /tmp/test.txt; }
+
+#show previous command in tab name
+#http://www.davidpashley.com/articles/xterm-titles-with-bash/
+#keep this at the end of the file or else running the bashrc commands will change the starting tab title
+# if [ "$SHELL" = '/bin/bash' ]
+# then
+#     case $TERM in
+#         rxvt|xterm-256color)
+#             #leaving functrace on causes the terminal to freak out on tab completion
+#             # set -o functrace
+#             trap 'echo -ne "\e]0;"; echo -n $BASH_COMMAND | cmd_summary.py; echo -ne "\007"; history -a; history -c; history -r;' DEBUG
+#             # trap 'PREV_CMD=$CURR_CMD; CURR_CMD=$BASH_COMMAND' DEBUG
+#          ;;
+#     esac
+# fi
 
 function quote() {
     #function from:
@@ -337,115 +518,34 @@ function quote() {
 
 function unquote() { echo "$1" | xargs echo; }
 
-function k() { ps aux | percol | awk '{ print $2 }' | xargs kill; }
-function eg() { emacs $(ag -g $1 | percol); }
-function psg() { ps -ef | grep "$1"; }
-function myip() { wget http://ipinfo.io/ip -qO -; }
-function geoip() { wget -qO - ipinfo.io/$1 | any2csv | plook -a; }
-function text() { curl http://textbelt.com/text -d number=$1 -d "message=$2"; }
-function textme() { text $PHONE_NUMBER $1; }
-function callme() { twilio_test.py -t $PHONE_NUMBER; }
-function alarm() { echo "speaker-test -c2 -t sine -l1" | at $1; }
-alias emailme="gmail.py -t $EMAIL_ADDRESS "
-function sshphone() { ssh -p 8022 -i ~/.ssh/jason-key-pair-useast.pem jtrigg@$1; }
-function scantopdf() {
-    #use scanimage -L to find device name and then insert in -d flag below
-    scanimage --resolution 200 --format=tiff -d 'hpaio:/usb/ENVY_4520_series?serial=TH5AO3D21T0660' | convert tiff:- -quality 40 -compress jpeg pdf:-;
-}
 
-function wifi() { nmcli d wifi connect "$1" password "$2"; }
-function wifi_ls() { nmcli c; nmcli d wifi list; }
-function wifi_disconnect() { nmcli c down id "$1"; }
-function wifi_reset() { sudo service network-manager restart; }
 
-function img() { jp2a --colors "$1"  | less -r; }
 
-function wiki() { pywiki.py "$1" | html2text -utf8 | tr '\n' ' '; echo; }
-function define() { dict $1 | head -25; }
+##########################################
+#######personal projects start here#######
+##########################################
 
-function debug() { set -o functrace; set -x; $("$@"); set +x; set +o functrace; }
 
-function mic() { amixer set Capture toggle; } # mute/unmute mic
-function b() { sudo bash -c "echo $1 > /sys/class/backlight/intel_backlight/brightness"; }
-function vu() { amixer -D pulse sset Master 5%+; }
-function vd() { amixer -D pulse sset Master 5%-; }
-function v() { amixer sset 'Master' ${1}%; }
-# function h() { grep -a $1 ~/.bash_history | tail; }
-function kt() { pkill -9 -P $$; } #kill all children of this terminal
-# function ff() { find ${2:-"."} -name '*'$1'*' | xargs -r ls -ltu | awk '{print $9}'; } #files with this name under this directory.
-# function ff1() { ff $1 | head -1; } #find most recently updated file with this name under this directory
-# function gf() { grep -r -l -i $1 .; } #recursive grep for files containing the string in the current directory
-function xsh() { cat - | tr '\n' '\0' | xargs -r -0 -n1 bash -c; } #run each line of /dev/stdin in bash (-r so it doesn't crash on empty input)
-function ew() { emacs $(which $1); } #eg: ew inmypath.py
-function eb() { emacs $(readlink -f ~/.bashrc); }
-function sb() { source ~/.bashrc; }
-function echoerr() { echo "$@" 1>&2; } #echo, but to /dev/stderr
+###########
+#torch setup
+###########
+. /home/jtrigg/torch/install/bin/torch-activate
+export PATH=/usr/local/cuda/bin/:$PATH;
+export LD_LIBRARY_PATH=/usr/local/cuda/lib64/:$LD_LIBRARY_PATH;
+export TIEFVISION_HOME=/home/jtrigg/github/tiefvision_dresses
 
-function bigdir() { du / | pawk -g 'int(l.split()[0]) > 1e6' -p 'write_line(l.split())' | psort -c0 -n | less; } #find big directories on the system
-function dudir() { du -sc .[!.]* * |sort -h -r; }
 
-#git shortcuts
-function gs() { git status; }
-function gl() {
-    if [ -n "$1" ]
-    then
-        git diff $1~ $1;
-    else
-        git diff HEAD~ HEAD;
-    fi
-}
-function gp() { git stash && git pull --rebase && git stash apply; }
-function gg() { git log -p -S$1; }
-function sgrep() { git grep "$@" -- ':/' ':/!*thirdparty*' ':/!*data*'; }
-# git log -p -M --follow --stat -- js/cloth/cloth.js
+###########
+# tensorflow setup
+##########
+export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/usr/local/cuda/lib64:/usr/local/cuda/extras/CUPTI/lib64"
+export CUDA_HOME="/usr/local/cuda"
 
-alias g="git"
-complete -o default -o nospace -F _git g
-#working directory = 1, staged = 2, committed = 3
-#these aliases copy your files from level i -> j for i,j in {1,2,3}
-alias g12="git add"
-alias g13="git commit"
-#No easy way to commit a single staged file
-#alias g23="git commit"
-alias g21="confirm git checkout --"
-alias g32="git reset --"
-alias g31="confirm git checkout HEAD --"
-alias gd="git diff"
-alias gd13="git diff HEAD"
-alias gd12="git diff"
-alias gd23="git diff --cached"
-alias gd31="git diff HEAD"
-alias gd21="git diff"
-alias gd32="git diff --cached"
 
-#prompt the user before running a command
-#http://askubuntu.com/a/22257
-confirm() {
-    echo -n "Are you sure you want to run '$*'? [N/y] "
-    read -N 1 REPLY
-    echo
-    if test "$REPLY" = "y" -o "$REPLY" = "Y"; then
-        "$@"
-    else
-        echo "Cancelled by user"
-    fi
-}
+###################
+# pantsme mysql
+###################
 
-#startup ssh execute
-function sse() { ssh deploy@pants-me.com -t "$1"; }
-
-#startup mysql shortcuts
-export MYSQL_DB="start"
-export MYSQL_HOST="pants-me.com"
-function tables() { db "show tables from start" | cat; }
-function dbi() { db -i "$1" | cat; }
-function dbd() { db -d "$1" | cat; }
-function dbc() { db --cat "$1"; }
-function dbh() { db --head "$1"; }
-function dbt() { db --tail "$1"; }
-function dbw() { dbtp -w "$@"; }
-function dbk() { db -r --key "$@" | ptr | plook -a -n; }
-function dbtp() { db -r "$@" | ptr | plook -a -n; }
 function dbwhere() { db "select * from start.product_variations where $1"; }
 VAR_SELECT="pv.*, rb.name ref_brand, rb.available brand_available, pf.id pf_family_id, pf.title family_title, ps.id source_id, ps.external_id, ps.parent_external_id, ps.features, ps.product_type_name, ps.editorial_reviews, ps.blacklist, ps.blacklist_score"
 function var() { dbtp 'SELECT '"$VAR_SELECT"' FROM start.product_sources ps LEFT JOIN start.product_variations pv ON ps.variation_id = pv.id LEFT JOIN start.brand_lookup bl ON pv.brand = bl.name LEFT JOIN start.reference_brands rb ON bl.brand_id = rb.id LEFT JOIN start.product_family_ids pfi ON pv.id = pfi.variation_id LEFT JOIN start.product_families pf ON pfi.family_id = pf.id WHERE pv.id = "'$1'"'; }
@@ -481,28 +581,16 @@ function mark_jeans() { db 'INSERT INTO start.image_classes (image_url, is_jeans
 function mark_jeans_asin() { db 'INSERT INTO start.image_classes (image_url, is_jeans) SELECT image_url,'$2' FROM start.product_sources ps WHERE ps.external_id = "'$1'" ON DUPLICATE KEY UPDATE is_jeans = '$2''; }
 function mark_jeans_var() { db 'INSERT INTO start.image_classes (image_url, is_jeans) SELECT image_url,'$2' FROM start.product_sources ps WHERE ps.variation_id = "'$1'" ON DUPLICATE KEY UPDATE is_jeans = '$2''; }
 
-
 function flag() { ${MS_DIR}/start_python/start/modelling/blacklist_jeans.py -l -p --variation "$1" -v; blacklist_sibs "$1"; not_jeans "$1"; }
 
-function watch_python() { find . -name '*.py' | entr sh -c 'sudo python '$PWD'/setup.py install > /dev/null' & }
-
-function fix_numpy() { less /var/lib/dpkg/status | pawk -b 'x=0' -p 'if "Package:" in l: x = "python-rdkit" in l;' 'if x and l.startswith("Depends:"): write_line([x for x in r if not "numpy" in x]); else: print l' > /tmp/test.txt; }
-
-weather() {
-    key=8b88e7d846a8fd02;
-    echo NYC:
-    echo ''
-    data=$(curl -s "http://api.wunderground.com/api/$key/forecast/q/NY/New_York.json" | jq -r ['.forecast.txt_forecast.forecastday[] | [.title], [.fcttext], ["break"] | .[]'])
-    echo $data | sed -e 's/[,]/\n/g' -e 's/[]"]/''/g' -e 's/[[]/''/g' -e 's/break/\n/g'
-}
+#startup ssh execute
+function sse() { ssh deploy@pants-me.com -t "$1"; }
 
 
-#handling for multiline commands (breaks if using "history -c; history -r" in PROMPT_COMMAND above)
-# shopt -s cmdhist lithist
 
-
-#PS2 is the prompt for multiline commands (defaults to ">")
-PS2=""
+##########
+# play (framework)
+##########
 
 alias icbm='python tools/icbm/build.py'
 alias play='thirdparty/play/play'
@@ -514,12 +602,6 @@ function bplay_prod() {
     echo -e "\033];$1\007" && icbm :$1_deploy && thirdparty/play/play run src/com/start/$1 --%prod ${@:2}
 }
 
-
-function space_check() {
-    sudo du -m --max-depth=4 / | sort -nr | head -n 20;
-}
-
-
 function dep() {
     cd ~/github/start_deploy
     git pull
@@ -528,31 +610,9 @@ function dep() {
     cd -
 }
 
-#show previous command in tab name
-#http://www.davidpashley.com/articles/xterm-titles-with-bash/
-#keep this at the end of the file or else running the bashrc commands will change the starting tab title
-# if [ "$SHELL" = '/bin/bash' ]
-# then
-#     case $TERM in
-#         rxvt|xterm-256color)
-#             #leaving functrace on causes the terminal to freak out on tab completion
-#             # set -o functrace
-#             trap 'echo -ne "\e]0;"; echo -n $BASH_COMMAND | cmd_summary.py; echo -ne "\007"; history -a; history -c; history -r;' DEBUG
-#             # trap 'PREV_CMD=$CURR_CMD; CURR_CMD=$BASH_COMMAND' DEBUG
-#          ;;
-#     esac
-# fi
 
 
-#torch setup
-. /home/jtrigg/torch/install/bin/torch-activate
-export PATH=/usr/local/cuda/bin/:$PATH;
-export LD_LIBRARY_PATH=/usr/local/cuda/lib64/:$LD_LIBRARY_PATH;
-export TIEFVISION_HOME=/home/jtrigg/github/tiefvision_dresses
-
-#tensorflow setup
-export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/usr/local/cuda/lib64:/usr/local/cuda/extras/CUPTI/lib64"
-export CUDA_HOME="/usr/local/cuda"
-
+######
 #start cloth simulation
+#######
 function cloth() { cd /home/jtrigg/github/mysize_shopping/experimental/cloth; (python -m SimpleHTTPServer 31014 &); while [ 1 ]; do gulp; sleep 3; done; }
