@@ -35,7 +35,8 @@
 ;;   (multi-occur-in-matching-buffers ".*" regexp))
 ;; (global-set-key (kbd "M-s /") 'my-multi-occur-in-matching-buffers)
 
-(global-set-key (kbd "M-s /") 'ag-project)
+(global-set-key (kbd "M-s ;") 'ag-project)
+(global-set-key (kbd "M-s :") 'ag-project-files) ;; search for a certain extension
 
 
 ;;remove all trailing whitespace before saving file
@@ -154,7 +155,6 @@
 (global-set-key (kbd "C-M-r") 'isearch-backward)
 
 
-
 ;save-as
 (global-set-key (kbd "C-c R") 'rename-file-and-buffer)
 
@@ -223,6 +223,17 @@
  '(web-mode-html-tag-bracket-face ((t (:foreground "white")))))
 
 
+
+;http://emacsredux.com/blog/2013/03/27/copy-filename-to-the-clipboard/
+(defun copy-file-name-to-clipboard ()
+  "Copy the current buffer file name to the clipboard."
+  (interactive)
+  (let ((filename (if (equal major-mode 'dired-mode)
+                      default-directory
+                    (buffer-file-name))))
+    (when filename
+      (kill-new filename)
+      (message "Copied buffer file name '%s' to the clipboard." filename))))
 
 
 ;;open-line copied from:
