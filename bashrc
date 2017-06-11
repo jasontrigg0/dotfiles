@@ -166,10 +166,22 @@ function h () {
 #http://unix.stackexchange.com/a/12108
 stty -ixon
 
+
+#https://serverfault.com/a/3758
+# ignore case, long prompt, exit if it fits on one screen, allow colors for ls and grep colors
+export LESS="-iMFXR"
+
+#https://serverfault.com/a/3758
+# must press ctrl-D 2+1 times to exit shell
+export IGNOREEOF="2"
+
 #make aliases available when using sudo
 alias sudo="sudo "
 
-
+#https://serverfault.com/a/9046
+#don't clobber existing files with >
+#(use >| to force overwrite)
+#shopt -o noclobber
 
 ######
 ## compression
@@ -230,6 +242,7 @@ alias ll='ls -alF'
 alias la='ls -A'
 alias l='ls -CF'
 alias sl='ls'
+alias lls='ls'
 function lsh { ls -ltu $1 | head; }
 function cl() { if $(test $# -gt 0); then cd $1; fi; if $(test $(ls | wc -l) -lt 200); then ls; fi; }
 # alias .="cl .."
@@ -289,8 +302,9 @@ function kt() { pkill -9 -P $$; } #kill all children of this terminal
 function text() { curl http://textbelt.com/text -d number=$1 -d "message=$2"; }
 function textme() { text $PHONE_NUMBER $1; }
 function callme() { twilio_test.py -t $PHONE_NUMBER; }
+function notifyme() { noti -p -t "$1" -m "${2:- }"; } #title and message
 alias emailme="gmail.py -t $EMAIL_ADDRESS "
-
+alias skype="skypeforlinux"
 
 #######
 # wifi
@@ -332,8 +346,18 @@ function echoerr() { echo "$@" 1>&2; } #echo, but to /dev/stderr
 #fzf for searching history
 #https://github.com/junegunn/fzf
 #(includes uninstall script if I don't like it)
+#(another option is https://github.com/dvorka/hstr)
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
 
+#qfc for autocompleting file names
+#turning this off for now because its ctrl+f shortcut clashes with normal emacs ctrl+f usage at the command line
+# [[ -s "$HOME/.qfc/bin/qfc.sh" ]] && source "$HOME/.qfc/bin/qfc.sh"
+
+######
+# python
+######
+alias python="python3"
+export PYTHONPATH=$PYTHONPATH:$HOME/Dropbox/misc_code/utils:$HOME/github/mysize_shopping/start_python:$HOME/github/mysize_shopping/experimental/street2shop
 
 #######
 # machine maintenance
@@ -362,6 +386,18 @@ function github_repo() {
     git push -u origin master
 }
 
+function cp_branch_master() {
+    #to replace the contents of master with the contents of a branch:
+    #https://ben.lobaugh.net/blog/202412/replace-one-git-branch-with-the-contents-of-another
+
+    #git checkout master
+    #git checkout -b "$1"
+    git merge -s ours master
+    git checkout master
+    git merge "$1"
+    # git push
+}
+
 alias g="git"
 complete -o default -o nospace -F _git g
 #working directory = 1, staged = 2, committed = 3
@@ -380,21 +416,21 @@ alias gd23="git diff --cached"
 alias gd31="git diff HEAD"
 alias gd21="git diff"
 alias gd32="git diff --cached"
+alias gitroot='cd $(git rev-parse --show-toplevel) && echo "$_"'
 
 #git shortcuts
 function gs() { git status; }
-function gl() {
-    if [ -n "$1" ]
-    then
-        git diff $1~ $1;
-    else
-        git diff HEAD~ HEAD;
-    fi
-}
+# function gl() {
+#     if [ -n "$1" ]
+#     then
+#         git diff $1~ $1;
+#     else
+#         git diff HEAD~ HEAD;
+#     fi
+# }
 function gp() { git stash && git pull --rebase && git stash apply; }
 function gg() { git log -p -S$1; }
 function sgrep() { git grep "$@" -- ':/' ':/!*thirdparty*' ':/!*data*'; }
-
 
 
 
@@ -437,7 +473,6 @@ PS2=""
 # export GOPATH=$HOME/go
 # export ANDROID_HOME=$HOME/Files/android_dev/android-sdk-linux
 export PATH=$PATH:$HOME/Dropbox/misc_code/utils:$HOME/Dropbox/misc_code/utils/R:$GOPATH/bin:$ANDROID_HOME/platforms:$ANDROID_HOME/tools:$HOME/Files/play
-export PYTHONPATH=$PYTHONPATH:$HOME/Dropbox/misc_code/utils:$HOME/github/mysize_shopping/start_python:$HOME/github/mysize_shopping/experimental/street2shop
 
 # export NVM_DIR="$HOME/.nvm"
 # [ -s "$NVM_DIR/nvm.sh" ] && source "$NVM_DIR/nvm.sh"  # This loads nvm
@@ -463,8 +498,21 @@ function mic() { amixer set Capture toggle; } # mute/unmute mic
 alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
 function serve {
     PORT_NUMBER=${1:-8000};
-    python -m SimpleHTTPServer $PORT_NUMBER;
+    python -m http.server $PORT_NUMBER;
 }
+
+# Auto-screen invocation. see: http://taint.org/wk/RemoteLoginAutoScreen
+# if we're coming from a remote SSH connection, in an interactive session
+# then automatically put us into a screen(1) session.   Only try once
+# -- if $STARTED_SCREEN is set, don't try it again, to avoid looping
+# if screen fails for some reason.
+if [ "$PS1" != "" -a "${STARTED_SCREEN:-x}" = x -a "${SSH_TTY:-x}" != x ]
+then
+  STARTED_SCREEN=1 ; export STARTED_SCREEN
+  screen -RR -S main || echo "Screen failed! continuing with normal bash startup"
+fi
+# [end of auto-screen snippet]
+
 
 #prompt the user before running a command
 #http://askubuntu.com/a/22257
@@ -522,9 +570,8 @@ function unquote() { echo "$1" | xargs echo; }
 
 
 ##########################################
-#######personal projects start here#######
+#######personal stuff starts here#######
 ##########################################
-
 
 ###########
 #torch setup
@@ -615,4 +662,4 @@ function dep() {
 ######
 #start cloth simulation
 #######
-function cloth() { cd /home/jtrigg/github/mysize_shopping/experimental/cloth; (python -m SimpleHTTPServer 31014 &); while [ 1 ]; do gulp; sleep 3; done; }
+function cloth() { cd /home/jtrigg/github/mysize_shopping/experimental/cloth; (python -m http.server 31014 &); while [ 1 ]; do node --max_old_space_size=4000 ./node_modules/.bin/gulp; sleep 3; done; }
