@@ -38,20 +38,23 @@
 (global-set-key (kbd "M-s ;") 'ag-project)
 (global-set-key (kbd "M-s :") 'ag-project-files) ;; search for a certain extension
 
+;;git tools
+(global-set-key (kbd "M-s g") 'git-timemachine-toggle)
+(global-set-key (kbd "C-x g") 'magit-status)
 
 ;;remove all trailing whitespace before saving file
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 
 ;; Automatically save and restore sessions
-(setq desktop-dirname             "~/.emacs.d/desktop/"
-      desktop-base-file-name      "emacs.desktop"
-      desktop-base-lock-name      "lock"
-      desktop-path                (list desktop-dirname)
-      desktop-save                t
-      desktop-files-not-to-save   "^$" ;reload tramp paths
-      desktop-auto-save-timeout   300
-      desktop-restore-eager 5
-      desktop-load-locked-desktop nil)
+;; (setq desktop-dirname             "~/.emacs.d/desktop/"
+;;       desktop-base-file-name      "emacs.desktop"
+;;       desktop-base-lock-name      "lock"
+;;       desktop-path                (list desktop-dirname)
+;;       desktop-save                t
+;;       desktop-files-not-to-save   "^$" ;reload tramp paths
+;;       desktop-auto-save-timeout   300
+;;       desktop-restore-eager 5
+;;       desktop-load-locked-desktop nil)
 
 ;;bugfix for desktop-restore with daemon mode
 ;;https://www.reddit.com/r/emacs/comments/3t5zqs/daemon_mode_with_desktopsavemode/cx3e0ps/
@@ -61,10 +64,13 @@
     (lambda (frame)
         (with-selected-frame frame
             (unless desktop-save-mode
-                ;; http://debbugs.gnu.org/cgi/bugreport.cgi?bug=17693
-                (if (daemonp) (setq desktop-restore-frames nil))
-                (desktop-save-mode 1)
-                (desktop-read)))))
+              ;; http://debbugs.gnu.org/cgi/bugreport.cgi?bug=17693
+              (if (daemonp) (setq desktop-restore-frames nil))
+              (setq desktop-dirname "~/.emacs.d/desktop/")
+              (setq desktop-path (list desktop-dirname))
+              (desktop-save-mode 1)
+              (desktop-read)
+              ))))
 
 ;MELPA package archive
 (when (>= emacs-major-version 24)
