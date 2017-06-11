@@ -176,11 +176,8 @@ bar {
 
 #######################################################################
 
-
-#can't get these two commands to work:
-#exec --no-startup-id gnome-settings-daemon
+#don't need this currently -- it's handled by dex below
 #exec --no-startup-id nm-applet  #wifi applet
-
 
 ###
 #enable fn keys:
@@ -202,3 +199,8 @@ bindsym XF86AudioPause exec playerctl pause
 bindsym XF86AudioNext exec playerctl next
 bindsym XF86AudioPrev exec playerctl previous
 ####
+
+###
+#run autostart commands (eg /etc/xdg/autostart or $HOME/.config/autostart) with i3
+#https://faq.i3wm.org/question/2155/how-can-i-use-autostart-desktop-files-in-i3.1.html
+exec dex -ae i3
