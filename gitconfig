@@ -6,10 +6,26 @@
 	name = jasontrigg0
 [core]
 	excludesfile = /home/jtrigg/.gitignore
+
+        #https://www.viget.com/articles/dress-up-your-git-diffs-with-word-level-highlights
+        pager = /usr/share/doc/git/contrib/diff-highlight/diff-highlight | less
 [multimailhook]
 	emailPrefix = [PantsMe Commit]
 [color]
 	ui = auto
+[color "diff-highlight"]
+        #https://www.viget.com/articles/dress-up-your-git-diffs-with-word-level-highlights
+       oldNormal = red bold
+       oldHighlight = red bold 52
+       newNormal = green bold
+       newHighlight = green bold 22
+[color "diff"]
+        commit = green
+        meta = yellow
+        frag = cyan
+        old = red
+        new = green
+        whitespace = red reverse
 [diff]
 	renames = copies
 	mnemonicprefix = true
