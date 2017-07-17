@@ -42,6 +42,13 @@ then
     ln -s $dir/i3config ~/.i3/config
 fi
 
+#setup autostart
+if [ -f "$dir/jtrigg.desktop" ]
+then
+    mv ~/.config/autostart/jtrigg.desktop $olddir
+    ln -s $dir/jtrigg.desktop ~/.config/autostart/jtrigg.desktop
+fi
+
 
 #setup .emacs.d directory
 #http://www.lingotrek.com/2010/12/integrating-emacs-with-x11-clipboard-in.html
