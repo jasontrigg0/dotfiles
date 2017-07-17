@@ -282,6 +282,7 @@ export EDITOR="emacsclient --alternate-editor= -t"
 function eb() { emacs $(readlink -f ~/.bashrc); }
 function sb() { source ~/.bashrc; }
 function ew() { emacs $(which $1); } #eg: ew inmypath.py
+function ef() { emacs $(find . -print | percol); }
 function eg() { emacs $(ag -g $1 | percol); }
 
 
@@ -420,6 +421,7 @@ alias gitroot='cd $(git rev-parse --show-toplevel) && echo "$_"'
 
 #git shortcuts
 function gs() { git status; }
+#gl now used for gitless
 # function gl() {
 #     if [ -n "$1" ]
 #     then
