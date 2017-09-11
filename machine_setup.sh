@@ -27,6 +27,8 @@ sudo pip install MySQL-python
 sudo easy_install sqlalchemy
 sudo easy_install pymysql
 
+sudo pip install diff-highlight #for pretty git diff
+
 #ag
 sudo apt-get install silversearcher-ag
 

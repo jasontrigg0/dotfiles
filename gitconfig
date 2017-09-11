@@ -9,7 +9,7 @@
 	excludesfile = /home/jtrigg/.gitignore
 
         #https://www.viget.com/articles/dress-up-your-git-diffs-with-word-level-highlights
-        pager = /usr/share/doc/git/contrib/diff-highlight/diff-highlight | less
+        pager = /usr/local/bin/diff-highlight | less
 [multimailhook]
 	emailPrefix = [PantsMe Commit]
 [color]
