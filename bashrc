@@ -361,6 +361,12 @@ function echoerr() { echo "$@" 1>&2; } #echo, but to /dev/stderr
 alias python="python3"
 export PYTHONPATH=$PYTHONPATH:$HOME/Dropbox/misc_code/utils:$HOME/github/mysize_shopping/start_python:$HOME/github/mysize_shopping/experimental/street2shop
 
+#Note: basic pip3 command (after running sudo apt-get install python3-pip) doesn't work for me
+#it still uses /usr/bin/python, which is python2 on my machine
+#instead following this advice
+#https://stackoverflow.com/questions/11268501/how-to-use-pip-with-python-3-x-alongside-python-2-x#comment41720502_19078295
+alias pip3="python3 -m pip"
+
 #######
 # machine maintenance
 #######
