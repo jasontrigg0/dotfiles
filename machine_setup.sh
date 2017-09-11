@@ -69,3 +69,6 @@ sudo apt-get install dex
 
 #concat pdfs
 sudo apt-get install pdftk
+
+#https://github.com/mbostock/gistup
+npm install -g gistup
