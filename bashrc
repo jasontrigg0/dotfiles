@@ -226,6 +226,7 @@ compress () {
         *.tgz) shift && tar czf $FILE $* ;;
         *.zip) shift && zip $FILE $* ;;
         *.rar) shift && rar $FILE $* ;;
+        *) echo "don't know how to compress '$1'..." ;;
         esac
     else
         echo "usage: compress <foo.tar.gz> ./foo ./bar"
@@ -474,7 +475,11 @@ PS2=""
 
 # export GOPATH=$HOME/go
 # export ANDROID_HOME=$HOME/Files/android_dev/android-sdk-linux
-export PATH=$PATH:$HOME/Dropbox/misc_code/utils:$HOME/Dropbox/misc_code/utils/R:$GOPATH/bin:$ANDROID_HOME/platforms:$ANDROID_HOME/tools:$HOME/Files/play
+ANDROID_HOME=/opt/android-sdk
+ANDROID_NATIVE_API_LEVEL=android-19
+ANDROID_NDK=/opt/android-ndk-r14
+ANDROID_PATH=/opt/android-sdk/tools:/opt/android-sdk/platform-tools:/opt/android-ndk-r14:$ANDROID_HOME/platforms:$ANDROID_HOME/tools
+export PATH=$PATH:$HOME/Dropbox/misc_code/utils:$HOME/Dropbox/misc_code/utils/R:$GOPATH/bin:$HOME/Files/play:"$ANDROID_PATH"
 
 # export NVM_DIR="$HOME/.nvm"
 # [ -s "$NVM_DIR/nvm.sh" ] && source "$NVM_DIR/nvm.sh"  # This loads nvm
@@ -665,3 +670,9 @@ function dep() {
 #start cloth simulation
 #######
 function cloth() { cd /home/jtrigg/github/mysize_shopping/experimental/cloth; (python -m http.server 31014 &); while [ 1 ]; do node --max_old_space_size=4000 ./node_modules/.bin/gulp; sleep 3; done; }
+
+
+######
+#swift setup
+#####
+export PATH=$HOME/files/swift-3.1.1-RELEASE-ubuntu16.04/usr/bin:"${PATH}"
