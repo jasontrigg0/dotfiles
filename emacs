@@ -35,6 +35,8 @@
 ;;   (multi-occur-in-matching-buffers ".*" regexp))
 ;; (global-set-key (kbd "M-s /") 'my-multi-occur-in-matching-buffers)
 
+(setq visible-bell t) ;; turn off annoying bell sound: http://emacsredux.com/blog/2016/02/14/disable-annoying-audio-notifications/
+
 (global-set-key (kbd "M-s ;") 'ag-project)
 (global-set-key (kbd "M-s :") 'ag-project-files) ;; search for a certain extension
 
