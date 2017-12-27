@@ -1,0 +1,2 @@
+#show tab options without needing to hit tab twice
+set show-all-if-ambiguous on
