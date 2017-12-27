@@ -1,12 +1,12 @@
 #!/bin/bash
 ############################
-# .make.sh
+# dotfile_setup.sh
 # This script creates symlinks from the home directory to any desired dotfiles in ~/dotfiles
 ############################
 
 dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )" #this script's directory
 olddir=$(dirname $dir)/dotfiles_old #old dotfiles backup directory
-files="bashrc bash_profile emacs gitignore gitconfig agignore startup" #list of files/folders to symlink in homedir
+files="bashrc bash_profile emacs gitignore gitconfig agignore startup screenrc inputrc" #list of files/folders to symlink in homedir
 
 
 # create dotfiles_old in homedir
@@ -39,7 +39,7 @@ fi
 if [ -f "$dir/i3config" ]
 then
     mv ~/.i3/config $olddir
-    ln -s $dir/i3config ~/.i3/config
+    ln -s $dir/i3config ~/.config/i3/config
 fi
 
 #setup autostart
@@ -62,3 +62,19 @@ fi
 
 #setup global .gitignore
 git config --global core.excludesfile $HOME/.gitignore
+
+#setup crontab
+#using ssmtp to get MAILTO to work with crontab
+#original ssmtp recommendation: https://askubuntu.com/a/536934
+#gmail setup: https://help.ubuntu.com/community/EmailAlerts
+#in case of gmail permissions problems: https://serverfault.com/questions/635139/how-to-fix-send-mail-authorization-failed-534-5-7-14/672182#672182
+sudo apt install ssmtp
+sudo cp $dir/ssmtp /etc/ssmtp/ssmtp.conf
+sudo sed -i 's/AuthUser=/AuthUser='"$MAILER_ADDRESS"'/g' /etc/ssmtp/ssmtp.conf
+sudo sed -i 's/AuthPass=/AuthPass='"$MAILER_PASSWORD"'/g' /etc/ssmtp/ssmtp.conf
+
+#install the actual crontab file
+sudo chown root $dir/crontab
+sudo ln -snf $dir/crontab /etc/cron.d/jtrigg
+#check the crontab logs here:
+#grep -i cron /var/log/syslog

@@ -1,0 +1,4 @@
+#note: mail is sent from jtrigg?
+MAILTO="jasontrigg0@gmail.com"
+0 12    * * *   jtrigg	/home/jtrigg/git/web-tracker/web-tracker/tracker.py > /dev/null
+45 23    * * *   jtrigg	python /home/jtrigg/misc_code/boltbus/scraper.py > /dev/null
