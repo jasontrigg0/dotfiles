@@ -3,6 +3,7 @@
 # for examples
 
 # If not running interactively, don't do anything
+#turn this off so ssh sessions can use the bashrc
 # case $- in
 #     *i*) ;;
 #       *) return;;
@@ -17,7 +18,7 @@ shopt -s checkwinsize
 
 # If set, the pattern "**" used in a pathname expansion context will
 # match all files and zero or more directories and subdirectories.
-#shopt -s globstar
+shopt -s globstar
 
 # make less more friendly for non-text input files, see lesspipe(1)
 [ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
@@ -58,8 +59,7 @@ unset color_prompt force_color_prompt
 #If this is an xterm set the title to user@host:dir
 case "$TERM" in
     xterm*|rxvt*)
-        #turn this off so tab naming based on last command words
-        # PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$PS1"
+        PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$PS1"
         ;;
 *)
     ;;
@@ -104,8 +104,6 @@ if ! shopt -oq posix; then
 fi
 
 
-
-
 ###########################
 
 
@@ -144,16 +142,16 @@ promptFunc() {
 }
 
 
-function h () {
-    #https://gist.github.com/redguardtoo/01868d7a13817c9845e8#file-bashrc
-    # reverse history, pick up one line, remove new line characters and put it into clipboard
-    if [ -z "$1" ]; then
-        echo "Usage: h keyword [-v]"
-        echo "  '-v' will filter OUT matched you typing interactively"
-    else
-        history | grep "$1" | sed '1!G;h;$!d' | percol $2 | sed -n 's/^ *[0-9][0-9]* *\(.*\)$/\1/p'| tr -d '\n' | pclip
-    fi
-}
+# function h () {
+#     #https://gist.github.com/redguardtoo/01868d7a13817c9845e8#file-bashrc
+#     # reverse history, pick up one line, remove new line characters and put it into clipboard
+#     if [ -z "$1" ]; then
+#         echo "Usage: h keyword [-v]"
+#         echo "  '-v' will filter OUT matched you typing interactively"
+#     else
+#         history | grep "$1" | sed '1!G;h;$!d' | percol $2 | sed -n 's/^ *[0-9][0-9]* *\(.*\)$/\1/p'| tr -d '\n' | copy
+#     fi
+# }
 
 
 
@@ -164,8 +162,9 @@ function h () {
 
 #keep ctrl+s from freezing terminal window:
 #http://unix.stackexchange.com/a/12108
-stty -ixon
-
+#NOTE: caused an error on ubuntu 17.10 + i3 (but not with default gnome)
+#fixed by changing like this https://stackoverflow.com/a/25391867
+[[ $- == *i* ]] && stty -ixon
 
 #https://serverfault.com/a/3758
 # ignore case, long prompt, exit if it fits on one screen, allow colors for ls and grep colors
@@ -184,37 +183,46 @@ alias sudo="sudo "
 #shopt -o noclobber
 
 ######
-## compression
+## compression / extraction
 ######
 
-# Easy extract -- move file into a new (empty folder) before extracting
+# Easy extract -- extracts into a new empty folder
 #https://gist.github.com/redguardtoo/01868d7a13817c9845e8#file-bashrc
 extract () {
-  if [ -f $1 ] ; then
-      case $1 in
-          *.tar.xz)    tar xvJf $1    ;;
-          *.tar.bz2)   tar xvjf $1    ;;
-          *.tar.gz)    tar xvzf $1    ;;
-          *.bz2)       bunzip2 $1     ;;
-          *.rar)       unrar e $1     ;;
-          *.gz)        gunzip $1      ;;
-          *.tar)       tar xvf $1     ;;
-          *.tbz2)      tar xvjf $1    ;;
-          *.tgz)       tar xvzf $1    ;;
-          *.apk)       unzip $1       ;;
-          *.epub)      unzip $1       ;;
-          *.xpi)       unzip $1       ;;
-          *.zip)       unzip $1       ;;
-          *.war)       unzip $1       ;;
-          *.jar)       unzip $1       ;;
-          *.Z)         uncompress $1  ;;
-          *.7z)        7z x $1        ;;
-          *)           echo "don't know how to extract '$1'..." ;;
-      esac
-  else
-      echo "'$1' is not a valid file!"
-  fi
+    if [ -f "$1" ] ; then
+        dir=$(dirname "$1");
+        base=$(basename "$1");
+        root="${base%%.*}"
+        path=$(realpath "$dir/$root")
+        echo "Extracting into directory \"$path\" ..."
+        mkdir "$root"
+        cd "$root"
+        infile=../"$1"
+        case "$1" in
+            *.tar.xz)    tar xvJf "$infile"    ;;
+            *.tar.bz2)   tar xvjf "$infile"    ;;
+            *.tar.gz)    tar xvzf "$infile"    ;;
+            *.bz2)       bunzip2 "$infile"     ;;
+            *.rar)       unrar e "$infile"     ;;
+            *.gz)        gunzip "$infile"      ;;
+            *.tar)       tar xvf "$infile"     ;;
+            *.tbz2)      tar xvjf "$infile"    ;;
+            *.tgz)       tar xvzf "$infile"    ;;
+            *.apk)       unzip "$infile"       ;;
+            *.epub)      unzip "$infile"       ;;
+            *.xpi)       unzip "$infile"       ;;
+            *.zip)       unzip "$infile"       ;;
+            *.war)       unzip "$infile"       ;;
+            *.jar)       unzip "$infile"       ;;
+            *.Z)         uncompress "$infile"  ;;
+            *.7z)        7z x "$infile"        ;;
+            *)           echo "don't know how to extract '$1'..." ;;
+        esac
+    else
+        echo "'$1' is not a valid file!"
+    fi
 }
+
 # easy compress - archive wrapper
 compress () {
     if [ -n "$1" ] ; then
@@ -245,7 +253,7 @@ alias l='ls -CF'
 alias sl='ls'
 alias lls='ls'
 function lsh { ls -ltu $1 | head; }
-function cl() { if $(test $# -gt 0); then cd $1; fi; if $(test $(ls | wc -l) -lt 200); then ls; fi; }
+# function cl() { if $(test $# -gt 0); then cd $1; fi; if $(test $(ls | wc -l) -lt 200); then ls; fi; }
 # alias .="cl .."
 # alias ..="cl ../.."
 # alias ...="cl ../../.."
@@ -260,7 +268,6 @@ alias copy='xclip -sel clip'
 alias paste='xclip -sel clip -o'
 #note: more
 #https://gist.github.com/redguardtoo/01868d7a13817c9845e8#file-bashrc
-
 
 ############
 # open / emacs
@@ -282,9 +289,9 @@ export EDITOR="emacsclient --alternate-editor= -t"
 
 function eb() { emacs $(readlink -f ~/.bashrc); }
 function sb() { source ~/.bashrc; }
-function ew() { emacs $(which $1); } #eg: ew inmypath.py
-function ef() { emacs $(find . -print | percol); }
-function eg() { emacs $(ag -g $1 | percol); }
+# function ew() { emacs $(which $1); } #eg: ew inmypath.py
+# function ef() { emacs $(find . -print | percol); }
+# function eg() { emacs $(ag -g $1 | percol); }
 
 
 
@@ -294,16 +301,23 @@ function eg() { emacs $(ag -g $1 | percol); }
 ########
 
 function k() { ps aux | percol | awk '{ print $2 }' | xargs kill; }
-function psg() { ps -ef | grep "$1"; }
+# function k9() { ps aux | percol | awk '{ print $2 }' | xargs kill -9; }
+# function psg() { ps -ef | grep "$1"; }
 function kt() { pkill -9 -P $$; } #kill all children of this terminal
 
 
 #######
 # communication
 #######
-function text() { curl http://textbelt.com/text -d number=$1 -d "message=$2"; }
+function text() {
+    curl --header 'Access-Token: '$PUSHBULLET_TOKEN'' \
+         --header 'Content-Type: application/json' \
+         --data-binary '{ "push": { "conversation_iden": "'$1'","message": "'$2'","package_name": "com.pushbullet.android","source_user_iden": "'$PUSHBULLET_USER_ID'","target_device_iden": "'$PUSHBULLET_PHONE_ID'", "type": "messaging_extension_reply" }, "type": "push" }' \
+         --request POST \
+         https://api.pushbullet.com/v2/ephemerals
+}
 function textme() { text $PHONE_NUMBER $1; }
-function callme() { twilio_test.py -t $PHONE_NUMBER; }
+# function callme() { twilio_test.py -t $PHONE_NUMBER; } #NOTE: this doesn't work, twilio trial ran out
 function notifyme() { noti -p -t "$1" -m "${2:- }"; } #title and message
 alias emailme="gmail.py -t $EMAIL_ADDRESS "
 alias skype="skypeforlinux"
@@ -326,8 +340,8 @@ function wifi_reset() { sudo service network-manager restart; }
 alias c="cal $(date '+%Y')"
 function myip() { wget http://ipinfo.io/ip -qO -; }
 function geoip() { wget -qO - ipinfo.io/$1 | any2csv | plook -a; }
-function wiki() { pywiki.py "$1" | html2text -utf8 | tr '\n' ' '; echo; }
-function define() { dict $1 | head -25; }
+# function wiki() { pywiki.py "$1" | html2text -utf8 | tr '\n' ' '; echo; }
+# function define() { dict $1 | head -25; }
 function weather() {
     key=8b88e7d846a8fd02;
     echo NYC:
@@ -349,7 +363,7 @@ function echoerr() { echo "$@" 1>&2; } #echo, but to /dev/stderr
 #https://github.com/junegunn/fzf
 #(includes uninstall script if I don't like it)
 #(another option is https://github.com/dvorka/hstr)
-[ -f ~/.fzf.bash ] && source ~/.fzf.bash
+# [ -f ~/.fzf.bash ] && source ~/.fzf.bash
 
 #qfc for autocompleting file names
 #turning this off for now because its ctrl+f shortcut clashes with normal emacs ctrl+f usage at the command line
@@ -359,7 +373,7 @@ function echoerr() { echo "$@" 1>&2; } #echo, but to /dev/stderr
 # python
 ######
 alias python="python3"
-export PYTHONPATH=$PYTHONPATH:$HOME/Dropbox/misc_code/utils:$HOME/github/mysize_shopping/start_python:$HOME/github/mysize_shopping/experimental/street2shop
+export PYTHONPATH=$PYTHONPATH
 
 #Note: basic pip3 command (after running sudo apt-get install python3-pip) doesn't work for me
 #it still uses /usr/bin/python, which is python2 on my machine
@@ -376,22 +390,46 @@ function space_check() {
     sudo du -m --max-depth=4 / | sort -nr | head -n 20;
 }
 
+function comp() {
+    sudo echo "hey" > /dev/null;
+    echo "-----";
+    echo "Computer:";
+    manufacturer=$(sudo dmidecode -s system-manufacturer)
+    model=$(sudo dmidecode -s system-product-name)
+    echo $manufacturer $model
+    echo "-----";
+    echo "CPU info:";
+    cat /proc/cpuinfo | grep 'model name' | uniq; #print cpu name
+    echo "-----";
+    echo "Memory info:";
+    grep -i memtotal /proc/meminfo | cat; #print memory quantity
+    echo "-----";
+    echo "Operating system:";
+    lsb_release -a 2>/dev/null | grep -i description | cat #print version of ubuntu
+    echo "-----";
+    echo "Linux kernel info:";
+    uname -a; #print version of linux kernel
+    echo "-----";
+    echo "Disk info:";
+    df -h | grep /dev/ | cat; #print disk space
+    echo "-----";
+    echo "Display manager:";
+    cat /etc/X11/default-display-manager
+    echo "-----";
+    echo "Desktop:";
+    echo $DESKTOP_SESSION
+    echo "-----"
+}
 
 
 ##################
 # git
 #################
 
-####setup a new github repository
-function github_repo() {
-    curl -u 'jasontrigg0' https://api.github.com/user/repos -d '{"name":"'$1'"}'
-    git init
-    git add .
-    git commit -m 'Initial commit'
-    git remote add origin git@github.com:jasontrigg0/$1.git
-    #sometimes this might help?
-    #git remote set-url origin git@github.com:jasontrigg0/$1.git
-    git push -u origin master
+#TODO: allow multiple arguments and watching multiple packages
+function i() { #watch packages and auto reinstall them
+    dir=$HOME/git/$1
+    ls $dir/*/* | entr sh -c 'cd '$dir'; sudo python2 setup.py install --force; sudo python3 setup.py install --force; cd -;'
 }
 
 function cp_branch_master() {
@@ -427,7 +465,7 @@ alias gd32="git diff --cached"
 alias gitroot='cd $(git rev-parse --show-toplevel) && echo "$_"'
 
 #git shortcuts
-function gs() { git status; }
+# function gs() { git status; }
 #gl now used for gitless
 # function gl() {
 #     if [ -n "$1" ]
@@ -438,8 +476,8 @@ function gs() { git status; }
 #     fi
 # }
 function gp() { git stash && git pull --rebase && git stash apply; }
-function gg() { git log -p -S$1; }
-function sgrep() { git grep "$@" -- ':/' ':/!*thirdparty*' ':/!*data*'; }
+# function gg() { git log -p -S$1; }
+# function sgrep() { git grep "$@" -- ':/' ':/!*thirdparty*' ':/!*data*'; }
 
 
 
@@ -449,9 +487,13 @@ function sgrep() { git grep "$@" -- ':/' ':/!*thirdparty*' ':/!*data*'; }
 #commandline mysql
 #####################
 
-export MYSQL_DB="start"
-export MYSQL_HOST="pants-me.com"
-function tables() { db "show tables from start" | cat; }
+export MYSQL_HOST="localhost"
+export MYSQL_DB="thingstodo"
+function add_mysql_db() { mysql -u root -p -e "CREATE DATABASE $1"; }
+function add_mysql_user() { mysql -u root -p -e "GRANT ALL PRIVILEGES ON *.* TO '$1'@'localhost' IDENTIFIED BY '$2';"; }
+#CREATE TABLE example
+# mysql -u root -p -e "CREATE TABLE pet (name VARCHAR(20), owner VARCHAR(20), species VARCHAR(20), sex CHAR(1), birth DATE, death DATE);"
+function tables() { db "show tables from $MYSQL_DB" | cat; }
 function dbi() { db -i "$1" | cat; }
 function dbd() { db -d "$1" | cat; }
 function dbc() { db --cat "$1"; }
@@ -485,7 +527,7 @@ ANDROID_HOME=/opt/android-sdk
 ANDROID_NATIVE_API_LEVEL=android-19
 ANDROID_NDK=/opt/android-ndk-r14
 ANDROID_PATH=/opt/android-sdk/tools:/opt/android-sdk/platform-tools:/opt/android-ndk-r14:$ANDROID_HOME/platforms:$ANDROID_HOME/tools
-export PATH=$PATH:$HOME/Dropbox/misc_code/utils:$HOME/Dropbox/misc_code/utils/R:$GOPATH/bin:$HOME/Files/play:"$ANDROID_PATH"
+export PATH=$PATH:$HOME/misc_code/python_scripts:$GOPATH/bin:$HOME/Files/play:"$ANDROID_PATH"
 
 # export NVM_DIR="$HOME/.nvm"
 # [ -s "$NVM_DIR/nvm.sh" ] && source "$NVM_DIR/nvm.sh"  # This loads nvm
@@ -495,8 +537,6 @@ function steam() { rm ~/.local/share/Steam/ubuntu12_32/steam-runtime/i386/usr/li
                    steam;
                  }
 
-# Add an "alert" alias for long running commands.  Use like so:
-#   sleep 10; alert
 function sshphone() { ssh -p 8022 -i ~/.ssh/jason-key-pair-useast.pem jtrigg@$1; }
 function alarm() { echo "speaker-test -c2 -t sine -l1" | at $1; }
 function scantopdf() {
@@ -508,7 +548,11 @@ function catpdfs() {
     pdftk "$@" cat output -;
 }
 function mic() { amixer set Capture toggle; } # mute/unmute mic
+
+# Add an "alert" alias for long running commands.  Use like so:
+#   sleep 10; alert
 alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
+
 function serve {
     PORT_NUMBER=${1:-8000};
     python -m http.server $PORT_NUMBER;
@@ -559,25 +603,26 @@ function fix_numpy() { less /var/lib/dpkg/status | pawk -b 'x=0' -p 'if "Package
 #     esac
 # fi
 
-function quote() {
-    #function from:
-    #https://www.jefftk.com/p/bash-argument-parsing-and-quoting
 
-    #related: good comments about quoting / variable expansion:
-    #http://stackoverflow.com/a/13819996
-    #http://unix.stackexchange.com/a/109074
-    first=true
-    for arg in "$@"; do
-        if $first; then first=false; else echo -n " "; fi
-        if echo "$arg" | grep -q '[^a-zA-Z0-9./_=-]'; then
-            arg="'$(echo "$arg" | sed -e 's~\\~\\\\~g' -e "s~'~\\\\'~g")'"
-        fi
-        echo -n "$arg"
-    done
-    echo
-}
+# function quote() {
+#     #function from:
+#     #https://www.jefftk.com/p/bash-argument-parsing-and-quoting
 
-function unquote() { echo "$1" | xargs echo; }
+#     #related: good comments about quoting / variable expansion:
+#     #http://stackoverflow.com/a/13819996
+#     #http://unix.stackexchange.com/a/109074
+#     first=true
+#     for arg in "$@"; do
+#         if $first; then first=false; else echo -n " "; fi
+#         if echo "$arg" | grep -q '[^a-zA-Z0-9./_=-]'; then
+#             arg="'$(echo "$arg" | sed -e 's~\\~\\\\~g' -e "s~'~\\\\'~g")'"
+#         fi
+#         echo -n "$arg"
+#     done
+#     echo
+# }
+
+# function unquote() { echo "$1" | xargs echo; }
 
 
 
@@ -589,62 +634,62 @@ function unquote() { echo "$1" | xargs echo; }
 ###########
 #torch setup
 ###########
-. /home/jtrigg/torch/install/bin/torch-activate
-export PATH=/usr/local/cuda/bin/:$PATH;
-export LD_LIBRARY_PATH=/usr/local/cuda/lib64/:$LD_LIBRARY_PATH;
-export TIEFVISION_HOME=/home/jtrigg/github/tiefvision_dresses
+# . /home/jtrigg/torch/install/bin/torch-activate
+# export PATH=/usr/local/cuda/bin/:$PATH;
+# export LD_LIBRARY_PATH=/usr/local/cuda/lib64/:$LD_LIBRARY_PATH;
+# export TIEFVISION_HOME=/home/jtrigg/github/tiefvision_dresses
 
 
 ###########
 # tensorflow setup
 ##########
-export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/usr/local/cuda/lib64:/usr/local/cuda/extras/CUPTI/lib64"
-export CUDA_HOME="/usr/local/cuda"
+# export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/usr/local/cuda/lib64:/usr/local/cuda/extras/CUPTI/lib64"
+# export CUDA_HOME="/usr/local/cuda"
 
 
 ###################
 # pantsme mysql
 ###################
 
-function dbwhere() { db "select * from start.product_variations where $1"; }
-VAR_SELECT="pv.*, rb.name ref_brand, rb.available brand_available, pf.id pf_family_id, pf.title family_title, ps.id source_id, ps.external_id, ps.parent_external_id, ps.features, ps.product_type_name, ps.editorial_reviews, ps.blacklist, ps.blacklist_score"
-function var() { dbtp 'SELECT '"$VAR_SELECT"' FROM start.product_sources ps LEFT JOIN start.product_variations pv ON ps.variation_id = pv.id LEFT JOIN start.brand_lookup bl ON pv.brand = bl.name LEFT JOIN start.reference_brands rb ON bl.brand_id = rb.id LEFT JOIN start.product_family_ids pfi ON pv.id = pfi.variation_id LEFT JOIN start.product_families pf ON pfi.family_id = pf.id WHERE pv.id = "'$1'"'; }
-function plotvar() { db -r 'SELECT image_url FROM product_variations pv WHERE pv.id = "'$1'"' | $MS_DIR/start_python/start/scripts/plotting.py; }
-function src() { dbtp 'SELECT * FROM product_sources ps WHERE ps.id = '$1''; }
-function brand() { dbtp 'SELECT bl.name lookup_name, rb.* FROM reference_brands rb LEFT JOIN brand_lookup bl ON rb.id = bl.brand_id WHERE rb.name REGEXP "'"$1"'" OR bl.name REGEXP "'"$1"'"'; }
-function fam() { db 'SELECT pf.* FROM product_families pf JOIN reference_brands rb ON rb.id = pf.brand_id WHERE rb.name REGEXP "'"$1"'"'; }
+# function dbwhere() { db "select * from start.product_variations where $1"; }
+# VAR_SELECT="pv.*, rb.name ref_brand, rb.available brand_available, pf.id pf_family_id, pf.title family_title, ps.id source_id, ps.external_id, ps.parent_external_id, ps.features, ps.product_type_name, ps.editorial_reviews, ps.blacklist, ps.blacklist_score"
+# function var() { dbtp 'SELECT '"$VAR_SELECT"' FROM start.product_sources ps LEFT JOIN start.product_variations pv ON ps.variation_id = pv.id LEFT JOIN start.brand_lookup bl ON pv.brand = bl.name LEFT JOIN start.reference_brands rb ON bl.brand_id = rb.id LEFT JOIN start.product_family_ids pfi ON pv.id = pfi.variation_id LEFT JOIN start.product_families pf ON pfi.family_id = pf.id WHERE pv.id = "'$1'"'; }
+# function plotvar() { db -r 'SELECT image_url FROM product_variations pv WHERE pv.id = "'$1'"' | $MS_DIR/start_python/start/scripts/plotting.py; }
+# function src() { dbtp 'SELECT * FROM product_sources ps WHERE ps.id = '$1''; }
+# function brand() { dbtp 'SELECT bl.name lookup_name, rb.* FROM reference_brands rb LEFT JOIN brand_lookup bl ON rb.id = bl.brand_id WHERE rb.name REGEXP "'"$1"'" OR bl.name REGEXP "'"$1"'"'; }
+# function fam() { db 'SELECT pf.* FROM product_families pf JOIN reference_brands rb ON rb.id = pf.brand_id WHERE rb.name REGEXP "'"$1"'"'; }
 
-function asin_var() { dbtp 'SELECT '"$VAR_SELECT"' FROM start.product_sources ps LEFT JOIN start.product_variations pv ON ps.variation_id = pv.id LEFT JOIN start.brand_lookup bl ON pv.brand = bl.name LEFT JOIN start.reference_brands rb ON bl.brand_id = rb.id LEFT JOIN start.product_family_ids pfi ON pv.id = pfi.variation_id LEFT JOIN start.product_families pf ON pfi.family_id = pf.id WHERE (ps.origin_id in ("2","3") and ps.external_id = "'$1'")'; }
-function sibs() { db 'SELECT '"$VAR_SELECT"' FROM start.product_sources ps LEFT JOIN start.product_variations pv ON ps.variation_id = pv.id LEFT JOIN start.reference_brands rb ON pv.brand_id = rb.id LEFT JOIN start.product_families pf ON pf.id = pv.family_id JOIN product_sources ps2 ON ps2.parent_id = ps.parent_id WHERE (ps2.origin_id IN ("2","3") and ps2.external_id = "'$1'") OR ps2.variation_id = "'$1'"'; }
-function blacklist() { db 'UPDATE start.product_sources ps SET ps.blacklist = 1 WHERE (ps.origin_id IN ("2","3") AND ps.external_id = "'$1'") OR ps.variation_id = "'$1'"'; }
-function blacklist_sibs() { db 'UPDATE start.product_sources ps JOIN start.product_sources ps2 ON ps.parent_id = ps2.parent_id SET ps.blacklist = 1 WHERE ps2.external_id = "'$1'" OR ps2.variation_id = "'$1'"'; }
-function blacklist_merge() { db 'DELETE pv FROM start.product_variations pv INNER JOIN start.product_sources ps ON ps.variation_id = pv.id WHERE (ps.blacklist OR ps.blacklist_score > 0.5)'; }
+# function asin_var() { dbtp 'SELECT '"$VAR_SELECT"' FROM start.product_sources ps LEFT JOIN start.product_variations pv ON ps.variation_id = pv.id LEFT JOIN start.brand_lookup bl ON pv.brand = bl.name LEFT JOIN start.reference_brands rb ON bl.brand_id = rb.id LEFT JOIN start.product_family_ids pfi ON pv.id = pfi.variation_id LEFT JOIN start.product_families pf ON pfi.family_id = pf.id WHERE (ps.origin_id in ("2","3") and ps.external_id = "'$1'")'; }
+# function sibs() { db 'SELECT '"$VAR_SELECT"' FROM start.product_sources ps LEFT JOIN start.product_variations pv ON ps.variation_id = pv.id LEFT JOIN start.reference_brands rb ON pv.brand_id = rb.id LEFT JOIN start.product_families pf ON pf.id = pv.family_id JOIN product_sources ps2 ON ps2.parent_id = ps.parent_id WHERE (ps2.origin_id IN ("2","3") and ps2.external_id = "'$1'") OR ps2.variation_id = "'$1'"'; }
+# function blacklist() { db 'UPDATE start.product_sources ps SET ps.blacklist = 1 WHERE (ps.origin_id IN ("2","3") AND ps.external_id = "'$1'") OR ps.variation_id = "'$1'"'; }
+# function blacklist_sibs() { db 'UPDATE start.product_sources ps JOIN start.product_sources ps2 ON ps.parent_id = ps2.parent_id SET ps.blacklist = 1 WHERE ps2.external_id = "'$1'" OR ps2.variation_id = "'$1'"'; }
+# function blacklist_merge() { db 'DELETE pv FROM start.product_variations pv INNER JOIN start.product_sources ps ON ps.variation_id = pv.id WHERE (ps.blacklist OR ps.blacklist_score > 0.5)'; }
 
-function asin() { google-chrome "http://www.amazon.com/dp/$1";
-}
-function offers() { db 'SELECT pso.* FROM start.product_sources ps LEFT JOIN start.product_variations pv ON ps.variation_id = pv.id LEFT JOIN start.product_source_offers pso ON pso.source_id = ps.id and pso.origin_id = ps.origin_id WHERE ps.external_id = "'$1'"'; }
+# function asin() { google-chrome "http://www.amazon.com/dp/$1";
+# }
+# function offers() { db 'SELECT pso.* FROM start.product_sources ps LEFT JOIN start.product_variations pv ON ps.variation_id = pv.id LEFT JOIN start.product_source_offers pso ON pso.source_id = ps.id and pso.origin_id = ps.origin_id WHERE ps.external_id = "'$1'"'; }
 
-MS_DIR=$HOME/github/mysize_shopping;
+# MS_DIR=$HOME/github/mysize_shopping;
 
 
-function color() { $MS_DIR/start_python/start/augment_jeans/process_image.py --asin "$1"; $MS_DIR/start_python/start/augment_jeans/main.py --sibling_variation "$1"; }
+# function color() { $MS_DIR/start_python/start/augment_jeans/process_image.py --asin "$1"; $MS_DIR/start_python/start/augment_jeans/main.py --sibling_variation "$1"; }
 
-function ms() { cd $MS_DIR; }
-function ffms() { ff $1 | grep -v build; }
-function eff() { emacs $(ff.py -p $1 -d ${2:-$MS_DIR} | head -1); }
+# function ms() { cd $MS_DIR; }
+# function ffms() { ff $1 | grep -v build; }
+# function eff() { emacs $(ff.py -p $1 -d ${2:-$MS_DIR} | head -1); }
 
 
 # function not_jeans() { db 'INSERT INTO start.image_classes (image_url, is_jeans) SELECT image_url,0 FROM start.product_sources ps WHERE ps.variation_id = "'$1'" OR ps.external_id = "'$1'" ON DUPLICATE KEY UPDATE is_jeans = 0'; }
-function not_jeans() { mark_jeans $1 0; }
-function is_jeans()  { mark_jeans $1 1; }
-function mark_jeans() { db 'INSERT INTO start.image_classes (image_url, is_jeans) SELECT image_url,'$2' FROM start.product_sources ps WHERE ps.id = "'$1'" ON DUPLICATE KEY UPDATE is_jeans = '$2''; }
-function mark_jeans_asin() { db 'INSERT INTO start.image_classes (image_url, is_jeans) SELECT image_url,'$2' FROM start.product_sources ps WHERE ps.external_id = "'$1'" ON DUPLICATE KEY UPDATE is_jeans = '$2''; }
-function mark_jeans_var() { db 'INSERT INTO start.image_classes (image_url, is_jeans) SELECT image_url,'$2' FROM start.product_sources ps WHERE ps.variation_id = "'$1'" ON DUPLICATE KEY UPDATE is_jeans = '$2''; }
+# function not_jeans() { mark_jeans $1 0; }
+# function is_jeans()  { mark_jeans $1 1; }
+# function mark_jeans() { db 'INSERT INTO start.image_classes (image_url, is_jeans) SELECT image_url,'$2' FROM start.product_sources ps WHERE ps.id = "'$1'" ON DUPLICATE KEY UPDATE is_jeans = '$2''; }
+# function mark_jeans_asin() { db 'INSERT INTO start.image_classes (image_url, is_jeans) SELECT image_url,'$2' FROM start.product_sources ps WHERE ps.external_id = "'$1'" ON DUPLICATE KEY UPDATE is_jeans = '$2''; }
+# function mark_jeans_var() { db 'INSERT INTO start.image_classes (image_url, is_jeans) SELECT image_url,'$2' FROM start.product_sources ps WHERE ps.variation_id = "'$1'" ON DUPLICATE KEY UPDATE is_jeans = '$2''; }
 
-function flag() { ${MS_DIR}/start_python/start/modelling/blacklist_jeans.py -l -p --variation "$1" -v; blacklist_sibs "$1"; not_jeans "$1"; }
+# function flag() { ${MS_DIR}/start_python/start/modelling/blacklist_jeans.py -l -p --variation "$1" -v; blacklist_sibs "$1"; not_jeans "$1"; }
 
-#startup ssh execute
-function sse() { ssh deploy@pants-me.com -t "$1"; }
+# #startup ssh execute
+# function sse() { ssh deploy@pants-me.com -t "$1"; }
 
 
 
@@ -652,33 +697,51 @@ function sse() { ssh deploy@pants-me.com -t "$1"; }
 # play (framework)
 ##########
 
-alias icbm='python tools/icbm/build.py'
-alias play='thirdparty/play/play'
-function bplay() {
-  echo -e "\033];$1\007" && icbm :$1_dev && thirdparty/play/play test src/com/start/$1 ${@:2}
-}
+# alias icbm='python tools/icbm/build.py'
+# alias play='thirdparty/play/play'
+# function bplay() {
+#   echo -e "\033];$1\007" && icbm :$1_dev && thirdparty/play/play test src/com/start/$1 ${@:2}
+# }
 
-function bplay_prod() {
-    echo -e "\033];$1\007" && icbm :$1_deploy && thirdparty/play/play run src/com/start/$1 --%prod ${@:2}
-}
+# function bplay_prod() {
+#     echo -e "\033];$1\007" && icbm :$1_deploy && thirdparty/play/play run src/com/start/$1 --%prod ${@:2}
+# }
 
-function dep() {
-    cd ~/github/start_deploy
-    git pull
-    rm -r build
-    ./deploy.sh
-    cd -
-}
+# function dep() {
+#     cd ~/github/start_deploy
+#     git pull
+#     rm -r build
+#     ./deploy.sh
+#     cd -
+# }
 
 
 
 ######
 #start cloth simulation
 #######
-function cloth() { cd /home/jtrigg/github/mysize_shopping/experimental/cloth; (python -m http.server 31014 &); while [ 1 ]; do node --max_old_space_size=4000 ./node_modules/.bin/gulp; sleep 3; done; }
+# function cloth() { cd /home/jtrigg/github/mysize_shopping/experimental/cloth; (python -m http.server 31014 &); while [ 1 ]; do node --max_old_space_size=4000 ./node_modules/.bin/gulp; sleep 3; done; }
 
 
 ######
 #swift setup
 #####
-export PATH=$HOME/files/swift-3.1.1-RELEASE-ubuntu16.04/usr/bin:"${PATH}"
+# export PATH=$HOME/files/swift-3.1.1-RELEASE-ubuntu16.04/usr/bin:"${PATH}"
+
+
+##commands for easy upload/download to storage server
+function cosaliup() {
+    scp "$1" $STORAGE_SERVER_USER@$STORAGE_SERVER:/upload
+}
+
+function cosalidown() {
+    scp $STORAGE_SERVER_USER@$STORAGE_SERVER:/upload/"$1" .
+}
+
+function cosalils() {
+    ssh $STORAGE_SERVER_USER@$STORAGE_SERVER ls -l /upload
+}
+
+function cosalirm() {
+    ssh $STORAGE_SERVER_USER@$STORAGE_SERVER rm /upload/"$1"
+}
