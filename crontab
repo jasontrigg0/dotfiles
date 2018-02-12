@@ -1,4 +1,10 @@
 #note: mail is sent from jtrigg?
 MAILTO="jasontrigg0@gmail.com"
+
+#to test out cron with the proper environment:
+#https://stackoverflow.com/a/2546509
+#* * * * * jtrigg env > /tmp/cronenv
+#env - `cat /tmp/cronenv` /bin/sh
+
 0 12    * * *   jtrigg	/home/jtrigg/git/web-tracker/web-tracker/tracker.py > /dev/null
-45 23    * * *   jtrigg	python /home/jtrigg/misc_code/boltbus/scraper.py > /dev/null
+0 13   * * *   jtrigg	python /home/jtrigg/misc_code/boltbus/scraper.py > /dev/null
