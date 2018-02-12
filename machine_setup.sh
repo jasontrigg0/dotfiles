@@ -24,6 +24,8 @@ sudo pip install sklearn
 sudo pip3 install sklearn
 # sudo easy_install csvkit
 
+sudo apt install npm
+
 #numpy scipy pandas
 # sudo apt install libblas-dev liblapack-dev libatlas-base-dev gfortran
 # sudo pip install numpy
