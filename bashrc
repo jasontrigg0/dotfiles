@@ -739,6 +739,7 @@ function fix_numpy() { less /var/lib/dpkg/status | pawk -b 'x=0' -p 'if "Package
 ##commands for easy upload/download to storage server
 function cosaliup() {
     scp "$1" $STORAGE_SERVER_USER@$STORAGE_SERVER:/upload
+    ssh $STORAGE_SERVER_USER@$STORAGE_SERVER chmod a+r /upload/"$1"
 }
 
 function cosalidown() {
