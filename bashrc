@@ -190,24 +190,31 @@ alias sudo="sudo "
 #https://gist.github.com/redguardtoo/01868d7a13817c9845e8#file-bashrc
 extract () {
     if [ -f "$1" ] ; then
-        dir=$(dirname "$1");
-        base=$(basename "$1");
-        root="${base%%.*}"
-        path=$(realpath "$dir/$root")
-        echo "Extracting into directory \"$path\" ..."
-        mkdir "$root"
-        cd "$root"
-        infile=../"$1"
+        case "$1" in
+            *.tar.xz|*.tar.bz2|*.tar.gz|*.tar|*.tbz2|*.tgz)
+                echo "here"
+                dir=$(dirname "$1");
+                base=$(basename "$1");
+                root="${base%%.*}"
+                path=$(realpath "$dir/$root")
+                echo "Extracting into directory \"$path\" ..."
+                mkdir "$root"
+                cd "$root"
+                infile=../"$1" ;;
+            *)
+                infile="$1" ;;
+
+        esac
         case "$1" in
             *.tar.xz)    tar xvJf "$infile"    ;;
             *.tar.bz2)   tar xvjf "$infile"    ;;
             *.tar.gz)    tar xvzf "$infile"    ;;
-            *.bz2)       bunzip2 "$infile"     ;;
-            *.rar)       unrar e "$infile"     ;;
-            *.gz)        gunzip "$infile"      ;;
             *.tar)       tar xvf "$infile"     ;;
             *.tbz2)      tar xvjf "$infile"    ;;
             *.tgz)       tar xvzf "$infile"    ;;
+            *.bz2)       bunzip2 "$infile"     ;;
+            *.rar)       unrar e "$infile"     ;;
+            *.gz)        gunzip "$infile"      ;;
             *.apk)       unzip "$infile"       ;;
             *.epub)      unzip "$infile"       ;;
             *.xpi)       unzip "$infile"       ;;
