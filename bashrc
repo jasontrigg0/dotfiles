@@ -191,18 +191,18 @@ alias sudo="sudo "
 extract () {
     if [ -f "$1" ] ; then
         case "$1" in
-            *.tar.xz|*.tar.bz2|*.tar.gz|*.tar|*.tbz2|*.tgz)
-                echo "here"
-                dir=$(dirname "$1");
-                base=$(basename "$1");
+            *.tar.xz|*.tar.bz2|*.tar.gz|*.tar|*.tbz2|*.tgz|*.zip)
+                fullpath=$(realpath "$1")
+                dir=$(dirname "$fullpath");
+                base=$(basename "$fullpath");
                 root="${base%%.*}"
-                path=$(realpath "$dir/$root")
+                path="$dir/$root"
+                mkdir $path
+                cd $path
                 echo "Extracting into directory \"$path\" ..."
-                mkdir "$root"
-                cd "$root"
-                infile=../"$1" ;;
+                infile="$fullpath" ;;
             *)
-                infile="$1" ;;
+                infile="$fullpath" ;;
 
         esac
         case "$1" in
