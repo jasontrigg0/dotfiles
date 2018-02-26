@@ -104,3 +104,7 @@ sudo apt install entr #ls file_to_watch.txt | entr sh -c 'echo "File changed"'
 sudo apt install jq #used by weather() command in bashrc
 
 #TODO: gitless install, if it ends up useful http://gitless.com/
+
+#docker
+sudo apt install docker
+sudo usermod -aG docker $USER
