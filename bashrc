@@ -397,8 +397,8 @@ function space_check() {
     sudo du -m --max-depth=4 / | sort -nr | head -n 20;
 }
 
-function comp() {
-    sudo echo "hey" > /dev/null;
+function machine() {
+    sudo echo "hey" > /dev/null; #get sudo permissions in advance
     echo "-----";
     echo "Computer:";
     manufacturer=$(sudo dmidecode -s system-manufacturer)
