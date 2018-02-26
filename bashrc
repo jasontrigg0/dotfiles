@@ -428,6 +428,21 @@ function machine() {
     echo "-----"
 }
 
+#####
+# docker
+####
+function dbuild() {
+    echo $@;
+    docker build -t ${1}:latest .;
+}
+alias dls="docker images -a"
+function drm() {
+    #https://coderwall.com/p/zguz_w/docker-remove-all-exited-containers
+    sudo docker rm $(docker ps --all -q -f status=exited) #cleanup exited dockers
+    sudo docker rmi "$@"
+}
+alias dps="docker ps"
+alias dk="docker kill $@"
 
 ##################
 # git
