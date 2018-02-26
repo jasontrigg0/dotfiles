@@ -59,6 +59,8 @@ fi
     echo "ERROR: unable to install xclip";
 }
 
+ln -snf $dir/install.el $HOME/.emacs.d/install.el
+
 
 #setup global .gitignore
 git config --global core.excludesfile $HOME/.gitignore

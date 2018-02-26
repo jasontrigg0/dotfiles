@@ -1,6 +1,11 @@
 ;;to reload this file:
 ;;M-x load-file and then enter twice
 ;;
+
+;;install.el from here: https://github.com/fuqcool/emacs-setting/blob/master/.emacs
+(load-file "~/.emacs.d/install.el")
+
+
 ;; I know that string is in my Emacs somewhere!
 ;;http://stackoverflow.com/a/2642655
 ;; (require 'cl)
@@ -74,14 +79,15 @@
               (desktop-read)
               ))))
 
-;MELPA package archive
-(when (>= emacs-major-version 24)
-  (require 'package)
-  (add-to-list
-   'package-archives
-   '("melpa" . "http://melpa.org/packages/")
-   t)
-  (package-initialize))
+;;I *think* package-archives should be set by install.el now
+;;MELPA package archive
+;; (when (>= emacs-major-version 24)
+;;   (require 'package)
+;;   (add-to-list
+;;    'package-archives
+;;    '("melpa" . "http://melpa.org/packages/")
+;;    t)
+;;   (package-initialize))
 
 
 ;use 4 spaces instead of tabs
@@ -218,8 +224,9 @@
 
 ;mode for js inside html
 (require 'web-mode)
-(add-to-list 'auto-mode-alist '("\\.html$" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.html\\'" . web-mode)) ;quote matches end of string: https://www.emacswiki.org/emacs/AutoModeAlist
 (add-to-list 'auto-mode-alist '("\\.jsx\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.ts\\'" . web-mode))
 
 ;;set by customize-face:
 (custom-set-faces
