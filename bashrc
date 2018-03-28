@@ -473,10 +473,15 @@ function dbuild() {
     docker build -t ${1}:latest .;
 }
 alias dls="docker images -a"
+function dockercleanup() {
+    # docker rm $(docker ps --all -q -f status=exited); #cleanup exited dockers
+    docker rmi $(sudo docker images --filter "dangling=true" -q --no-trunc)
+}
+
 function drm() {
     #https://coderwall.com/p/zguz_w/docker-remove-all-exited-containers
-    sudo docker rm $(docker ps --all -q -f status=exited) #cleanup exited dockers
-    sudo docker rmi "$@"
+    dockercleanup;
+    sudo docker rmi "$@";
 }
 alias dps="docker ps"
 alias dk="docker kill $@"
