@@ -49,8 +49,32 @@ if [ -n "$force_color_prompt" ]; then
     fi
 fi
 
+#color definitions
+#https://unix.stackexchange.com/a/140618
+COLOR_RESTORE=$(echo -e '\033[0m') # No Color
+COLOR_WHITE=$(echo -e '\e[1;37m')
+COLOR_BLACK=$(echo -e '\e[0;30m')
+COLOR_BLUE=$(echo -e '\e[0;34m')
+COLOR_LIGHT_BLUE=$(echo -e '\e[1;34m')
+COLOR_GREEN=$(echo -e '\e[0;32m')
+COLOR_LIGHT_GREEN=$(echo -e '\e[1;32m')
+COLOR_CYAN=$(echo -e '\e[0;36m')
+COLOR_LIGHT_CYAN=$(echo -e '\e[1;36m')
+COLOR_RED=$(echo -e '\033[0;31m')
+COLOR_LIGHT_RED=$(echo -e '\e[1;31m')
+COLOR_PURPLE=$(echo -e '\e[0;35m')
+COLOR_LIGHT_PURPLE=$(echo -e '\e[1;35m')
+COLOR_BROWN=$(echo -e '\e[0;33m')
+COLOR_YELLOW=$(echo -e '\e[1;33m')
+COLOR_GRAY=$(echo -e '\e[0;30m')
+COLOR_LIGHT_GRAY=$(echo -e '\e[0;37m')
+
 if [ "$color_prompt" = yes ]; then
-    PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
+    if [ ! -z "$SSH_CONNECTION" ]; then
+        PS1='${debian_chroot:+($debian_chroot)}${COLOR_RED}\u@\h${COLOR_RESTORE}:${COLOR_RED}\w${COLOR_RESTORE}\$ ' #show all red in SSH connection
+    else
+        PS1='${debian_chroot:+($debian_chroot)}${COLOR_LIGHT_GREEN}\u@\h${COLOR_RESTORE}:${COLOR_LIGHT_BLUE}\w${COLOR_RESTORE}\$ '
+    fi
 else
     PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
 fi
