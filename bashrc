@@ -448,11 +448,17 @@ function machine() {
     echo "Linux kernel info:";
     uname -a; #print version of linux kernel
     echo "-----";
-    echo "Disk info:";
+    echo "Disk information:";
+    lsblk | grep '^sd' | cat;
+    echo "-----";
+    echo "Free space on mounted partitions:";
     df -h | grep /dev/ | cat; #print disk space
     echo "-----";
     echo "Display manager:";
     cat /etc/X11/default-display-manager
+    echo "-----";
+    echo "Resolution:"; #1920x1080 pixels
+    xdpyinfo  | grep -o ' .*x.* pixels' --color=never
     echo "-----";
     echo "Desktop:";
     echo $DESKTOP_SESSION
