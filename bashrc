@@ -216,10 +216,10 @@ extract () {
     if [ -f "$1" ] ; then
         case "$1" in
             *.tar.xz|*.tar.bz2|*.tar.gz|*.tar|*.tbz2|*.tgz|*.zip)
-                fullpath=$(realpath "$1")
+                fullpath=$(realpath "$1");
                 dir=$(dirname "$fullpath");
                 base=$(basename "$fullpath");
-                root="${base%%.*}"
+                root="${base%.*}" #remove extension
                 path="$dir/$root"
                 mkdir $path
                 cd $path
