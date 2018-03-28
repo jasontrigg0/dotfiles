@@ -304,7 +304,7 @@ alias paste='xclip -sel clip -o'
 # open / emacs
 ############
 
-function o () { #open an arbitrary file
+function o() { #open an arbitrary file
     xdg-open "$@" > /dev/null 2>&1 &
 }
 function img() { jp2a --colors "$1"  | less -r; } #show jpg in the terminal
@@ -320,9 +320,16 @@ export EDITOR="emacsclient --alternate-editor= -t"
 
 function eb() { emacs $(readlink -f ~/.bashrc); }
 function sb() { source ~/.bashrc; }
+function eg() {
+    if [ -z "$1" ]; then
+        emacs $(ag -g "" | percol);
+    else
+        emacs $(ag -g "$1" | percol);
+    fi;
+}
+alias ag="ag -W 120"
 # function ew() { emacs $(which $1); } #eg: ew inmypath.py
 # function ef() { emacs $(find . -print | percol); }
-# function eg() { emacs $(ag -g $1 | percol); }
 
 
 
