@@ -508,10 +508,24 @@ function cp_branch_master() {
     # git push
 }
 
+function git_revert_file() {
+    #https://stackoverflow.com/a/7196615
+    confirm git show HEAD -- $1 | git apply -R
+}
+
+function git_old() {
+    #show old version of a file
+    #git_old COMMIT file
+    GITPATH=$(git ls-tree --full-name --name-only HEAD ${2});
+    git show ${1}:$GITPATH;
+}
+
 alias g="git"
 complete -o default -o nospace -F _git g
-#working directory = 1, staged = 2, committed = 3
+#information on checkout, reset, revert: https://www.atlassian.com/git/tutorials/resetting-checking-out-and-reverting
+#working directory = 1, staged = 2, committed = 3, (another diff = 9)
 #these aliases copy your files from level i -> j for i,j in {1,2,3}
+#use . to apply to all files
 alias g12="git add"
 alias g13="git commit"
 #No easy way to commit a single staged file
@@ -519,6 +533,18 @@ alias g13="git commit"
 alias g21="confirm git checkout --"
 alias g32="git reset --"
 alias g31="confirm git checkout HEAD --"
+function g92() {
+    #pull from a diff into staging location (= 2)
+    #usage: g92 DIFF file1 file2...
+    DIFF=$1;
+    shift;
+    git checkout ${DIFF} -- "$@";
+}
+function g91() {
+    g92 "$@";
+    shift;
+    g21 "$@";
+}
 alias gd="git diff"
 alias gd13="git diff HEAD"
 alias gd12="git diff"
