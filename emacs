@@ -3,6 +3,8 @@
 ;;
 
 ;;install.el from here: https://github.com/fuqcool/emacs-setting/blob/master/.emacs
+;;specify required packages in install.el
+(package-initialize)
 (load-file "~/.emacs.d/install.el")
 
 
@@ -225,8 +227,11 @@
 ;mode for js inside html
 (require 'web-mode)
 (add-to-list 'auto-mode-alist '("\\.html\\'" . web-mode)) ;quote matches end of string: https://www.emacswiki.org/emacs/AutoModeAlist
+(add-to-list 'auto-mode-alist '("\\.js\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.jsx\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.ts\\'" . web-mode))
+
+(add-to-list 'auto-mode-alist '("\\.csv\\'" . csv-mode))
 
 ;;set by customize-face:
 (custom-set-faces
@@ -301,10 +306,12 @@ Position the cursor at it's beginning, according to the current mode."
 ;; (add-to-list 'interpreter-mode-alist '("python" . python-mode))
 
 
+;; csv hook to align
+(add-hook 'csv-mode-hook (lambda () (define-key csv-mode-map (kbd "C-c C-c") (defun csv-align-visible (&optional arg) "Align visible fields" (interactive "P") (csv-align-fields nil (window-start) (window-end))))))
+
 
 ;https://github.com/jorgenschaefer/elpy
 ;sudo pip install jedi required for elpy
-(package-initialize)
 (elpy-enable)
 
 
@@ -313,7 +320,8 @@ Position the cursor at it's beginning, according to the current mode."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(ag-arguments (quote ("--smart-case" "--stats" "-A 5" "-B 5"))))
+ '(ag-arguments (quote ("--smart-case" "--stats" "-A 5" "-B 5")))
+ '(package-selected-packages (quote (csv-mode web-mode elpy))))
 
 (defun module_fns ()
   (interactive)

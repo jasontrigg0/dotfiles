@@ -2,7 +2,9 @@
 (require 'cl-lib)
 
 (let* ((packages '(elpy
-                   web-mode))
+                   web-mode
+                   csv-mode
+                   ))
        (uninstalled-packages (cl-remove-if 'package-installed-p packages)))
 
   (when (> (length uninstalled-packages) 0)
