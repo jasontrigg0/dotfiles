@@ -625,7 +625,6 @@ ANDROID_NDK=/opt/android-ndk-r14
 ANDROID_PATH=/opt/android-sdk/tools:/opt/android-sdk/platform-tools:/opt/android-ndk-r14:$ANDROID_HOME/platforms:$ANDROID_HOME/tools
 export PATH=$PATH:$HOME/local/bin:$HOME/misc_code/python_scripts:$GOPATH/bin:$HOME/Files/play:"$ANDROID_PATH"
 
-
 # export NVM_DIR="$HOME/.nvm"
 # [ -s "$NVM_DIR/nvm.sh" ] && source "$NVM_DIR/nvm.sh"  # This loads nvm
 
@@ -827,19 +826,24 @@ function fix_numpy() { less /var/lib/dpkg/status | pawk -b 'x=0' -p 'if "Package
 
 
 ##commands for easy upload/download to storage server
-function cosaliup() {
+function archup() {
     scp "$1" $STORAGE_SERVER_USER@$STORAGE_SERVER:/upload
     ssh $STORAGE_SERVER_USER@$STORAGE_SERVER chmod a+r /upload/$(basename "$1")
 }
 
-function cosalidown() {
-    scp $STORAGE_SERVER_USER@$STORAGE_SERVER:/upload/"$1" .
+function archdown() {
+    scp $STORAGE_SERVER_USER@$STORAGE_SERVER:/upload/"$1" "${2:-.}"
 }
 
-function cosalils() {
+function archls() {
     ssh $STORAGE_SERVER_USER@$STORAGE_SERVER ls -l /upload
 }
 
-function cosalirm() {
+function archrm() {
     ssh $STORAGE_SERVER_USER@$STORAGE_SERVER rm /upload/"$1"
+}
+
+function archmv() {
+    archdown $1 $2;
+    archrm $1;
 }
