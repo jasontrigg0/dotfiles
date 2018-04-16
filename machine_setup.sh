@@ -128,3 +128,6 @@ sudo apt install pv
 
 #for i3 screenshot shortcuts
 sudo apt install scrot
+
+#for storing secret files on git
+sudo apt install git-crypt
