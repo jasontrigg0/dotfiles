@@ -1,6 +1,3 @@
-Host 13.59.189.158
-  IdentityFile ~/.ssh/id_rsa
-
 Host archlabs.com
   IdentityFile ~/.ssh/id_rsa
 
