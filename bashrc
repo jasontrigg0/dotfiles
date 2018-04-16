@@ -623,7 +623,7 @@ ANDROID_HOME=/opt/android-sdk
 ANDROID_NATIVE_API_LEVEL=android-19
 ANDROID_NDK=/opt/android-ndk-r14
 ANDROID_PATH=/opt/android-sdk/tools:/opt/android-sdk/platform-tools:/opt/android-ndk-r14:$ANDROID_HOME/platforms:$ANDROID_HOME/tools
-export PATH=$PATH:$HOME/local/bin:$HOME/misc_code/python_scripts:$GOPATH/bin:$HOME/Files/play:"$ANDROID_PATH"
+export PATH=$PATH:$HOME/local/bin:$HOME/scripts:$GOPATH/bin:$HOME/Files/play:"$ANDROID_PATH"
 
 # export NVM_DIR="$HOME/.nvm"
 # [ -s "$NVM_DIR/nvm.sh" ] && source "$NVM_DIR/nvm.sh"  # This loads nvm
