@@ -24,7 +24,18 @@ sudo pip install sklearn
 sudo pip3 install sklearn
 # sudo easy_install csvkit
 
-sudo apt install npm
+#nvm (installs in user directory)
+curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.8/install.sh | bash
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+#upgrade node
+nvm install node --reinstall-packages-from=node || nvm install node #reinstall-packages-from won't work on the initial installation
+sudo chown -R jtrigg /usr/local/lib/node_modules #setup permissions for npm install -g with https://github.com/npm/npm/issues/8165#issuecomment-98382865
+ln -snf $(npm root -g) ~/.node_modules #load modules from global folders. this isn't recommended. https://nodejs.org/api/modules.html#modules_loading_from_the_global_folders
+
+#nvm install node should install npm, so the below command is unnecessary, right?
+# sudo apt install npm
 
 #numpy scipy pandas
 # sudo apt install libblas-dev liblapack-dev libatlas-base-dev gfortran
