@@ -381,6 +381,7 @@ function wifi_reset() { sudo service network-manager restart; }
 
 alias c="cal $(date '+%Y')"
 function myip() { wget http://ipinfo.io/ip -qO -; }
+function flush_dns_cache() { sudo systemd-resolve --flush-caches; } #https://askubuntu.com/a/909173
 function geoip() { wget -qO - ipinfo.io/$1 | any2csv | plook -a; }
 # function wiki() { pywiki.py "$1" | html2text -utf8 | tr '\n' ' '; echo; }
 # function define() { dict $1 | head -25; }
