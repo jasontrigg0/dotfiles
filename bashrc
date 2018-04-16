@@ -559,6 +559,7 @@ alias gd21="git diff"
 alias gd32="git diff --cached"
 alias gitroot='cd $(git rev-parse --show-toplevel) && echo "$_"'
 
+
 #git shortcuts
 # function gs() { git status; }
 #gl now used for gitless
@@ -582,8 +583,6 @@ function gp() { git stash && git pull --rebase && git stash apply; }
 #commandline mysql
 #####################
 
-export MYSQL_HOST="localhost"
-export MYSQL_DB="thingstodo"
 function add_mysql_db() { mysql -u root -p -e "CREATE DATABASE $1"; }
 function add_mysql_user() { mysql -u root -p -e "GRANT ALL PRIVILEGES ON *.* TO '$1'@'localhost' IDENTIFIED BY '$2';"; }
 #CREATE TABLE example
@@ -597,7 +596,7 @@ function dbt() { db --tail "$1"; }
 function dbw() { dbtp -w "$@"; }
 function dbk() { db -r --key "$@" | ptr | plook -a -n; }
 function dbtp() { db -r "$@" | ptr | plook -a -n; }
-
+function dba() { db 'SELECT * FROM '$1''; }
 
 
 ##############
