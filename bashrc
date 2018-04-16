@@ -322,13 +322,13 @@ alias e="emacsclient --alternate-editor= -t"
 alias emacs="emacsclient --alternate-editor= -t"
 export EDITOR="emacsclient --alternate-editor= -t"
 
-function eb() { emacs $(readlink -f ~/.bashrc); }
+function eb() { $EDITOR $(readlink -f ~/.bashrc); }
 function sb() { source ~/.bashrc; }
 function eg() {
     if [ -z "$1" ]; then
-        emacs $(ag -g "" | percol);
+        $EDITOR $(ag -g "" | percol);
     else
-        emacs $(ag -g "$1" | percol);
+        $EDITOR $(ag -g "$1" | percol);
     fi;
 }
 alias ag="ag -W 120"
