@@ -44,8 +44,10 @@ sudo pip install scipy
 sudo pip3 install scipy
 
 sudo pip install xlrd
-# sudo apt install libmysqlclient-dev
-# sudo pip install MySQL-python
+
+sudo apt install mysql-client
+sudo apt install libmysqlclient-dev #needed for python's mysqlclient
+sudo pip3 install mysqlclient
 
 # sudo easy_install sqlalchemy
 # sudo easy_install pymysql
