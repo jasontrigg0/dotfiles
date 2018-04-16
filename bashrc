@@ -218,9 +218,9 @@ alias sudo="sudo "
 #https://gist.github.com/redguardtoo/01868d7a13817c9845e8#file-bashrc
 extract () {
     if [ -f "$1" ] ; then
+        fullpath=$(realpath "$1");
         case "$1" in
             *.tar.xz|*.tar.bz2|*.tar.gz|*.tar|*.tbz2|*.tgz|*.zip)
-                fullpath=$(realpath "$1");
                 dir=$(dirname "$fullpath");
                 base=$(basename "$fullpath");
                 root="${base%.*}" #remove extension
