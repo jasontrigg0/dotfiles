@@ -121,3 +121,10 @@ sudo apt install jq #used by weather() command in bashrc
 #docker
 sudo apt install docker
 sudo usermod -aG docker $USER
+sudo curl -L https://github.com/docker/compose/releases/download/1.19.0/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
+
+#random utility to show file progress
+sudo apt install pv
+
+#for i3 screenshot shortcuts
+sudo apt install scrot
