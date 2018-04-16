@@ -1,1 +1,2 @@
 pypirc filter=git-crypt diff=git-crypt
+bash_private filter=git-crypt diff=git-crypt
