@@ -615,6 +615,8 @@ PS2=""
 ## miscellaneous
 ################
 
+alias lock='i3lock -n'
+
 # export GOPATH=$HOME/go
 # export ANDROID_HOME=$HOME/Files/android_dev/android-sdk-linux
 ANDROID_HOME=/opt/android-sdk
