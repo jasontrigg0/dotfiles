@@ -49,6 +49,7 @@ if [ -n "$force_color_prompt" ]; then
     fi
 fi
 
+
 #color definitions
 #https://unix.stackexchange.com/a/140618
 COLOR_RESTORE=$(echo -e '\033[0m') # No Color
@@ -69,11 +70,14 @@ COLOR_YELLOW=$(echo -e '\e[1;33m')
 COLOR_GRAY=$(echo -e '\e[0;30m')
 COLOR_LIGHT_GRAY=$(echo -e '\e[0;37m')
 
+#use \[ \] around colors or else terminal multi-line commands may wrap onto the same line
+#https://askubuntu.com/a/24422
+#TODO: try to include the \[ and \] in the color definitions above, maybe this can help? https://stackoverflow.com/a/43462720
 if [ "$color_prompt" = yes ]; then
     if [ ! -z "$SSH_CONNECTION" ]; then
-        PS1='${debian_chroot:+($debian_chroot)}${COLOR_RED}\u@\h${COLOR_RESTORE}:${COLOR_RED}\w${COLOR_RESTORE}\$ ' #show all red in SSH connection
+        PS1='${debian_chroot:+($debian_chroot)}\[${COLOR_RED}\]\u@\h\[${COLOR_RESTORE}\]:\[${COLOR_RED}\]\w\[${COLOR_RESTORE}\]\$ ' #show all red in SSH connection
     else
-        PS1='${debian_chroot:+($debian_chroot)}${COLOR_LIGHT_GREEN}\u@\h${COLOR_RESTORE}:${COLOR_LIGHT_BLUE}\w${COLOR_RESTORE}\$ '
+        PS1='${debian_chroot:+($debian_chroot)}\[${COLOR_LIGHT_GREEN}\]\u@\h\[${COLOR_RESTORE}\]:\[${COLOR_LIGHT_BLUE}\]\w\[${COLOR_RESTORE}\]\$ '
     fi
 else
     PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
