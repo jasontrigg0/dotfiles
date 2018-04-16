@@ -70,12 +70,16 @@ git config --global core.excludesfile $HOME/.gitignore
 #original ssmtp recommendation: https://askubuntu.com/a/536934
 #gmail setup: https://help.ubuntu.com/community/EmailAlerts
 #in case of gmail permissions problems: https://serverfault.com/questions/635139/how-to-fix-send-mail-authorization-failed-534-5-7-14/672182#672182
+#sample usage: echo -e 'Subject: subj\n\nhey' | ssmtp jasontrigg0@gmail.com
 sudo apt install ssmtp
 sudo cp $dir/ssmtp /etc/ssmtp/ssmtp.conf
 sudo sed -i 's/AuthUser=/AuthUser='"$MAILER_ADDRESS"'/g' /etc/ssmtp/ssmtp.conf
 sudo sed -i 's/AuthPass=/AuthPass='"$MAILER_PASSWORD"'/g' /etc/ssmtp/ssmtp.conf
 
 #install the actual crontab file
+
+#https://askubuntu.com/a/54861
+#"It's a bad idea to symlink scripts [to /etc/cron.d] that are owned and writable for non-root users, since your system could be compromised that way"
 sudo chown root $dir/crontab
 sudo ln -snf $dir/crontab /etc/cron.d/jtrigg
 #check the crontab logs here:
