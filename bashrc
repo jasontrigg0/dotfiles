@@ -323,6 +323,7 @@ alias emacs="emacsclient --alternate-editor= -t"
 export EDITOR="emacsclient --alternate-editor= -t"
 
 function eb() { $EDITOR $(readlink -f ~/.bashrc); }
+function ebp() { $EDITOR $(readlink -f ~/.bash_private); }
 function sb() { source ~/.bashrc; }
 function eg() {
     if [ -z "$1" ]; then
@@ -588,6 +589,8 @@ function add_mysql_user() { mysql -u root -p -e "GRANT ALL PRIVILEGES ON *.* TO 
 #CREATE TABLE example
 # mysql -u root -p -e "CREATE TABLE pet (name VARCHAR(20), owner VARCHAR(20), species VARCHAR(20), sex CHAR(1), birth DATE, death DATE);"
 function tables() { db "show tables from $MYSQL_DB" | cat; }
+#https://stackoverflow.com/a/5648713
+function fields() { db 'select TABLE_NAME, COLUMN_NAME, ORDINAL_POSITION, COLUMN_DEFAULT, IS_NULLABLE, DATA_TYPE from information_schema.columns where table_schema = "'$MYSQL_DB'" order by table_name, ordinal_position'; }
 function dbi() { db -i "$1" | cat; }
 function dbd() { db -d "$1" | cat; }
 function dbc() { db --cat "$1"; }
