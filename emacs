@@ -221,7 +221,8 @@
 ;(single quote matches end-of-string)
 (add-to-list 'auto-mode-alist '("\\emacs\\'" . emacs-lisp-mode))
 (add-to-list 'auto-mode-alist '("\\.scss\\'" . css-mode))
-(add-to-list 'auto-mode-alist '("\\ashrc\\'" . sh-mode)) ;HACK: for some reason including the b in "bashrc" here doesn't work??
+(add-to-list 'auto-mode-alist '("\\.bashrc\\'" . sh-mode)) ;HACK: for some reason including the b in "bashrc" here doesn't work without the . as well??
+(add-to-list 'auto-mode-alist '("\\.bash_private\\'" . sh-mode)) ;HACK: for some reason including the b in "bashrc" here doesn't work without the . as well??
 (add-to-list 'auto-mode-alist '("\\.ses\\'" . ses-mode))
 
 ;mode for js inside html
