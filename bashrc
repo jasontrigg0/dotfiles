@@ -618,6 +618,10 @@ PS2=""
 ## miscellaneous
 ################
 
+function csvsplit() {
+    python -c 'print("'"$1"'".split(",")['"$2"'])';
+}
+
 alias lock='i3lock -n'
 
 # export GOPATH=$HOME/go
