@@ -1,21 +1,21 @@
 [alias]
-        lol = log --graph --decorate --pretty=oneline --abbrev-commit
-        lola = log --graph --decorate --pretty=oneline --abbrev-commit --all
-        up = pull --rebase --autostash
+       lol = log --graph --decorate --pretty=oneline --abbrev-commit
+       lola = log --graph --decorate --pretty=oneline --abbrev-commit --all
+       up = pull --rebase --autostash
 [user]
-	email = jasontrigg0@gmail.com
-	name = jasontrigg0
+       email = jasontrigg0@gmail.com
+       name = Jason Trigg
 [core]
-	excludesfile = /home/jtrigg/.gitignore
+       excludesfile = /home/jtrigg/.gitignore
 
-        #https://www.viget.com/articles/dress-up-your-git-diffs-with-word-level-highlights
-        pager = /usr/local/bin/diff-highlight | less
-[multimailhook]
-	emailPrefix = [PantsMe Commit]
+       #https://www.viget.com/articles/dress-up-your-git-diffs-with-word-level-highlights
+       pager = /usr/local/bin/diff-highlight | less
+# [multimailhook]
+#        emailPrefix = [Commit]
 [color]
-	ui = auto
+       ui = auto
 [color "diff-highlight"]
-        #https://www.viget.com/articles/dress-up-your-git-diffs-with-word-level-highlights
+       #https://www.viget.com/articles/dress-up-your-git-diffs-with-word-level-highlights
        oldNormal = red bold
        oldHighlight = red bold 52
        newNormal = green bold
