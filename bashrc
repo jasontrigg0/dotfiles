@@ -328,6 +328,14 @@ alias paste='xclip -sel clip -o'
 #note: more
 #https://gist.github.com/redguardtoo/01868d7a13817c9845e8#file-bashrc
 
+
+#-r: relative symlinks by default
+#https://superuser.com/a/837935
+#-f: forces overwrite of existing files at the location
+#also reminder: ln syntax is like cp
+#$1 is the source of the link, $2 is the destination
+alias ln='ln -snfr'
+
 ############
 # open / emacs
 ############
