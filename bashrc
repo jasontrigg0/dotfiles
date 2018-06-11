@@ -368,15 +368,12 @@ alias ag="ag -W 120 --hidden" #limit ag results to 120 characters per line, also
 # function ew() { emacs $(which $1); } #eg: ew inmypath.py
 # function ef() { emacs $(find . -print | percol); }
 
-
-
-
 ########
 # handle processes
 ########
 
 function k() { ps aux | percol | awk '{ print $2 }' | xargs kill; }
-# function k9() { ps aux | percol | awk '{ print $2 }' | xargs kill -9; }
+function k9() { ps aux | percol | awk '{ print $2 }' | xargs kill -9; }
 # function psg() { ps -ef | grep "$1"; }
 function kt() { pkill -9 -P $$; } #kill all children of this terminal
 
@@ -465,6 +462,7 @@ function dudir() { du -sc .[!.]* * |sort -h -r; }
 function space_check() {
     sudo du -m --max-depth=4 / | sort -nr | head -n 20;
 }
+
 
 function machine() {
     sudo echo "hey" > /dev/null; #get sudo permissions in advance
