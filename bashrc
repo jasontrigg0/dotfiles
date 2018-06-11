@@ -510,7 +510,17 @@ function dbuild() {
 }
 alias dls="docker images -a"
 function dockercleanup() {
+    docker rm $(docker ps -a -q) #cleanup stopped containers
     # docker rm $(docker ps --all -q -f status=exited); #cleanup exited dockers
+
+    #prompt for deletion of image tags
+    tags=$(docker images -a | awk '$1 != "<none>" && $2 != "<none>" && NR > 1{print $1 ":" $2}')
+
+    echo "Checking if we can delete existing tagged images:"
+    for t in ${tags}; do
+        confirm docker rmi $t
+    done
+
     docker rmi $(sudo docker images --filter "dangling=true" -q --no-trunc)
 }
 
