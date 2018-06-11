@@ -2,37 +2,37 @@
        lol = log --graph --decorate --pretty=oneline --abbrev-commit
        lola = log --graph --decorate --pretty=oneline --abbrev-commit --all
        up = pull --rebase --autostash
+       diff = diff --color-words --word-diff=color
 [user]
        email = jasontrigg0@gmail.com
        name = Jason Trigg
+       username = jasontrigg0
 [core]
        excludesfile = /home/jtrigg/.gitignore
-
        #https://www.viget.com/articles/dress-up-your-git-diffs-with-word-level-highlights
-       pager = /usr/local/bin/diff-highlight | less
+       pager = /home/jtrigg/scripts/diff-highlight | less
 # [multimailhook]
 #        emailPrefix = [Commit]
 [color]
-       ui = auto
+	ui = true
 [color "diff-highlight"]
-       #https://www.viget.com/articles/dress-up-your-git-diffs-with-word-level-highlights
-       oldNormal = red bold
-       oldHighlight = red bold 52
-       newNormal = green bold
-       newHighlight = green bold 22
+	oldNormal = red bold
+	oldHighlight = red bold 52
+	newNormal = green bold
+	newHighlight = green bold 22
 [color "diff"]
-        commit = green
-        meta = yellow
-        frag = cyan
-        old = red
-        new = green
-        whitespace = red reverse
+	meta = yellow
+	frag = magenta bold
+	commit = yellow bold
+	old = red bold
+	new = green bold
+	whitespace = red reverse
 [diff]
-	renames = copies
-	mnemonicprefix = true
+       renames = copies
+       mnemonicprefix = true
 [merge]
-        tool = ediff
-	stat = true
+       tool = ediff
+       stat = true
 [mergetool.ediff]
     #http://stackoverflow.com/a/1818855
     #adding desktop-save-mode 0 to keep the new instance from prompting about saving

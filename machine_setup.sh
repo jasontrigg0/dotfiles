@@ -52,7 +52,10 @@ sudo pip3 install mysqlclient
 # sudo easy_install sqlalchemy
 # sudo easy_install pymysql
 
-sudo pip install diff-highlight #for pretty git diff
+#https://www.viget.com/articles/dress-up-your-git-diffs-with-word-level-highlights
+#prettier git diffs
+mkdir -p $HOME/scripts
+curl https://raw.githubusercontent.com/git/git/fd99e2bda0ca6a361ef03c04d6d7fdc7a9c40b78/contrib/diff-highlight/diff-highlight > $HOME/scripts/diff-highlight && chmod +x $HOME/scripts/diff-highlight
 
 #ag
 sudo apt install silversearcher-ag

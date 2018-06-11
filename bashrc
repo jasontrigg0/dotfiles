@@ -551,6 +551,8 @@ function g91() {
     shift;
     g21 "$@";
 }
+
+alias diff="git diff --no-index" #git style diff from the command line
 alias gd="git diff"
 alias gd13="git diff HEAD"
 alias gd12="git diff"
