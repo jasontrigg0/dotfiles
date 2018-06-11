@@ -633,6 +633,7 @@ function add_mysql_user() { mysql -u root -p -e "GRANT ALL PRIVILEGES ON *.* TO 
 function tables() { db "show tables from $MYSQL_DB" | cat; }
 #https://stackoverflow.com/a/5648713
 function fields() { db 'select TABLE_NAME, COLUMN_NAME, ORDINAL_POSITION, COLUMN_DEFAULT, IS_NULLABLE, DATA_TYPE from information_schema.columns where table_schema = "'$MYSQL_DB'" order by table_name, ordinal_position'; }
+function fields() { db 'select * from information_schema.columns where table_schema = "'$MYSQL_DB'" order by table_name, ordinal_position'; }
 function dbi() { db -i "$1" | cat; }
 function dbd() { db -d "$1" | cat; }
 function dbc() { db --cat "$1"; }
@@ -642,7 +643,8 @@ function dbw() { dbtp -w "$@"; }
 function dbk() { db -r --key "$@" | ptr | plook -a -n; }
 function dbtp() { db -r "$@" | ptr | plook -a -n; }
 function dba() { db 'SELECT * FROM '$1''; }
-
+function dbtree() { db -r --tree; }
+function dbtreerev() { db -r --tree_rev; }
 
 ##############
 # multiline commands
@@ -656,9 +658,34 @@ PS2=""
 
 
 
-#################
+################
 ## miscellaneous
 ################
+function bash_most_used() {
+    less ~/.bash_history | tr '\|' '\n' | pawk -p 'print(l.strip())' | awk '{print $1}' | sort | uniq -c | sort -k1 -n -r | head -100
+}
+
+alias nx='npm run-script env --' #https://stackoverflow.com/a/39991116
+alias npmscripts='less package.json | any2csv --path scripts | ptr | plook -n -a'
+
+function timestamp() {
+    date '+%Y%m%d_%H%m%S';
+}
+
+function macro_record() {
+    echo "Press F4 to stop (takes a second after you press it)"
+    cnee --record -o $HOME/.macro --mouse --keyboard -t 0.1 -sk 'F4' --first-last > /dev/null 2>&1;
+}
+
+function macro_play() {
+    #eg: to replay 10 times
+    #macro_play 10
+    echo "Press F4 to stop (if running multiple iterations it only stops a single iteration)"
+    cnt=${1:-1}
+    for i in $(seq $cnt); do
+        cnee --replay -f $HOME/.macro -t 0.1 -sk 'F4' > /dev/null 2>&1;
+    done
+}
 
 function csvsplit() {
     python -c 'print("'"$1"'".split(",")['"$2"'])';
