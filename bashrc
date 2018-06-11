@@ -312,7 +312,7 @@ alias l='ls -CF'
 alias sl='ls'
 alias lls='ls'
 function lsh { ls -ltu $1 | head; }
-# function cl() { if $(test $# -gt 0); then cd $1; fi; if $(test $(ls | wc -l) -lt 200); then ls; fi; }
+function cl() { if $(test $# -gt 0); then cd $1; fi; if $(test $(ls | wc -l) -lt 200); then ls; fi; }
 # alias .="cl .."
 # alias ..="cl ../.."
 # alias ...="cl ../../.."
