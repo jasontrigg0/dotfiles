@@ -725,7 +725,7 @@ function mic() { amixer set Capture toggle; } # mute/unmute mic
 #   sleep 10; alert
 alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
 
-function serve {
+function quickserve {
     PORT_NUMBER=${1:-8000};
     python -m http.server $PORT_NUMBER;
 }
@@ -746,7 +746,7 @@ fi
 #prompt the user before running a command
 #http://askubuntu.com/a/22257
 confirm() {
-    echo -n "Are you sure you want to run '$*'? [N/y] "
+    echo "Are you sure you want to run '$*'? [N/y] "
     read -N 1 REPLY
     echo
     if test "$REPLY" = "y" -o "$REPLY" = "Y"; then
@@ -759,6 +759,9 @@ confirm() {
 function watch_python() { find . -name '*.py' | entr sh -c 'sudo python '$PWD'/setup.py install > /dev/null' & }
 
 function fix_numpy() { less /var/lib/dpkg/status | pawk -b 'x=0' -p 'if "Package:" in l: x = "python-rdkit" in l;' 'if x and l.startswith("Depends:"): write_line([x for x in r if not "numpy" in x]); else: print l' > /tmp/test.txt; }
+
+
+
 
 #show previous command in tab name
 #http://www.davidpashley.com/articles/xterm-titles-with-bash/
