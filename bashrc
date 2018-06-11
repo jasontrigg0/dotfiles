@@ -222,7 +222,9 @@ export LESS="-iMFXR"
 
 #https://serverfault.com/a/3758
 # must press ctrl-D 2+1 times to exit shell
-export IGNOREEOF="2"
+if [ -z "$SSH_CONNECTION" ]; then
+    export IGNOREEOF="2"
+fi
 
 #make aliases available when using sudo
 alias sudo="sudo "
