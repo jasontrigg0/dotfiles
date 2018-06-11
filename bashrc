@@ -70,6 +70,11 @@ COLOR_YELLOW=$(echo -e '\e[1;33m')
 COLOR_GRAY=$(echo -e '\e[0;30m')
 COLOR_LIGHT_GRAY=$(echo -e '\e[0;37m')
 
+
+########
+#PS1: runs to display the prompt string and optionally, to set the tab title
+########
+
 #use \[ \] around colors or else terminal multi-line commands may wrap onto the same line
 #https://askubuntu.com/a/24422
 #TODO: try to include the \[ and \] in the color definitions above, maybe this can help? https://stackoverflow.com/a/43462720
@@ -84,14 +89,31 @@ else
 fi
 unset color_prompt force_color_prompt
 
-#If this is an xterm set the title to user@host:dir
+PS1_BASIC=$PS1; #BASIC_PS1 sets the prompt without setting the terminal title
+PS1_SET_TITLE="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$PS1_BASIC"; #PS1 to set the tab title as well as the prompt string
+
+#If this is an xterm set the tab title to user@host:dir with every new prompt
 case "$TERM" in
     xterm*|rxvt*)
-        PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$PS1"
+        PS1=$PS1_SET_TITLE
         ;;
 *)
     ;;
 esac
+
+function set_title() {
+    echo -e "\e]0;"; echo -n "$1"; echo -ne "\007";
+    PS1=$PS1_BASIC; #revert to PS1_BASIC which sets the prompt without adjusting the tab title (see above)
+}
+
+function unset_title() {
+    PS1=$PS1_SET_TITLE;
+}
+
+
+#######
+#aliases
+#######
 
 # enable color support of ls and also add handy aliases
 if [ -x /usr/bin/dircolors ]; then
