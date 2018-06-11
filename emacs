@@ -36,11 +36,11 @@
 
 
 ;; search in all open buffers
-;; (defun my-multi-occur-in-matching-buffers (regexp &optional allbufs)
-;;   "Show all lines matching REGEXP in all buffers."
-;;   (interactive (occur-read-primary-args))
-;;   (multi-occur-in-matching-buffers ".*" regexp))
-;; (global-set-key (kbd "M-s /") 'my-multi-occur-in-matching-buffers)
+(defun my-multi-occur-in-matching-buffers (regexp &optional allbufs)
+  "Show all lines matching REGEXP in all buffers."
+  (interactive (occur-read-primary-args))
+  (multi-occur-in-matching-buffers ".*" regexp))
+(global-set-key (kbd "M-s /") 'my-multi-occur-in-matching-buffers)
 
 (setq visible-bell t) ;; turn off annoying bell sound: http://emacsredux.com/blog/2016/02/14/disable-annoying-audio-notifications/
 
@@ -52,6 +52,7 @@
 (global-set-key (kbd "C-x g") 'magit-status)
 
 ;;remove all trailing whitespace before saving file
+;;but don't remove it in markdown files
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 
 ;; Automatically save and restore sessions
@@ -80,17 +81,6 @@
               (desktop-save-mode 1)
               (desktop-read)
               ))))
-
-;;I *think* package-archives should be set by install.el now
-;;MELPA package archive
-;; (when (>= emacs-major-version 24)
-;;   (require 'package)
-;;   (add-to-list
-;;    'package-archives
-;;    '("melpa" . "http://melpa.org/packages/")
-;;    t)
-;;   (package-initialize))
-
 
 ;use 4 spaces instead of tabs
 (setq-default indent-tabs-mode nil)
@@ -221,7 +211,7 @@
 ;(single quote matches end-of-string)
 (add-to-list 'auto-mode-alist '("\\emacs\\'" . emacs-lisp-mode))
 (add-to-list 'auto-mode-alist '("\\.scss\\'" . css-mode))
-(add-to-list 'auto-mode-alist '("\\.bashrc\\'" . sh-mode)) ;HACK: for some reason including the b in "bashrc" here doesn't work without the . as well??
+(add-to-list 'auto-mode-alist '("\\ashrc\\'" . sh-mode)) ;HACK: for some reason including the b in "bashrc" here doesn't work without the . as well??
 (add-to-list 'auto-mode-alist '("\\.bash_private\\'" . sh-mode)) ;HACK: for some reason including the b in "bashrc" here doesn't work without the . as well??
 (add-to-list 'auto-mode-alist '("\\.ses\\'" . ses-mode))
 
