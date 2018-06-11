@@ -364,7 +364,7 @@ function eg() {
         $EDITOR $(ag -g "$1" | percol);
     fi;
 }
-alias ag="ag -W 120"
+alias ag="ag -W 120 --hidden" #limit ag results to 120 characters per line, also show hidden files such as .env by default
 # function ew() { emacs $(which $1); } #eg: ew inmypath.py
 # function ef() { emacs $(find . -print | percol); }
 
