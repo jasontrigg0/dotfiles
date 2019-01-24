@@ -251,8 +251,8 @@ extract () {
                 base=$(basename "$fullpath");
                 root="${base%.*}" #remove extension
                 path="$dir/$root"
-                mkdir $path
-                cd $path
+                mkdir "$path"
+                cd "$path"
                 echo "Extracting into directory \"$path\" ..."
                 infile="$fullpath" ;;
             *)
