@@ -134,3 +134,7 @@ sudo apt install scrot
 
 #for storing secret files on git
 sudo apt install git-crypt
+
+#chromedriver
+sudo apt-get install chromium-chromedriver
+sudo cp /usr/lib/chromium-browser/chromedriver /usr/bin/chromedriver
