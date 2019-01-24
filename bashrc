@@ -705,7 +705,6 @@ function bash_most_used() {
     less ~/.bash_history | tr '\|' '\n' | pawk -p 'print(l.strip())' | awk '{print $1}' | sort | uniq -c | sort -k1 -n -r | head -100
 }
 
-alias nx='npm run-script env --' #https://stackoverflow.com/a/39991116
 alias npmscripts='less package.json | any2csv --path scripts | ptr | plook -n -a'
 
 function timestamp() {
