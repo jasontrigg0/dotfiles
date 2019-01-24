@@ -577,6 +577,25 @@ function git_old() {
     git show ${1}:$GITPATH;
 }
 
+#common tasks
+#view single commit diff: git log -p -1 $COMMIT
+#view all diffs to a given file: git log -p $FILE
+#grep through diffs: git log -p -G $GREP
+#     OR             git log --stat -G $GREP
+#grep through commit messages git lop -g --grep $GREP
+
+#want git aliases+functions that
+#apply to all files work with or without ".".
+#unlike the raw git functions which sometimes need "."
+#and sometimes cannot have "."
+function _drop_final_dot() {
+    if [ "${@: -1}" == "." ]; then
+        "${@:1:$(($#-1))}" #https://stackoverflow.com/a/1215592
+    else
+        "$@"
+    fi;
+}
+
 alias g="git"
 complete -o default -o nospace -F _git g
 #information on checkout, reset, revert: https://www.atlassian.com/git/tutorials/resetting-checking-out-and-reverting
@@ -588,8 +607,8 @@ alias g13="git commit"
 #No easy way to commit a single staged file
 #alias g23="git commit"
 alias g21="confirm git checkout --"
-alias g32="git reset --"
-alias g31="confirm git checkout HEAD --"
+alias g32="_drop_final_dot git reset --"
+alias g31="confirm git checkout HEAD --" #doesn't work on all files (with or without .)
 function g92() {
     #pull from a diff into staging location (= 2)
     #usage: g92 DIFF file1 file2...
@@ -598,13 +617,19 @@ function g92() {
     git checkout ${DIFF} -- "$@";
 }
 function g91() {
+    #pull from a diff into working directory (= 1)
+    #usage: g92 DIFF file1 file2...
     g92 "$@";
     shift;
     g21 "$@";
 }
 
+#TODO: try https://gist.github.com/mwhite/6887990
 alias diff="git diff --no-index" #git style diff from the command line
 alias gd="git diff"
+alias ga="git add"
+alias gc="git commit"
+alias gs="git status"
 alias gd13="git diff HEAD"
 alias gd12="git diff"
 alias gd23="git diff --cached"
