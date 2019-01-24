@@ -793,7 +793,8 @@ confirm() {
     if test "$REPLY" = "y" -o "$REPLY" = "Y"; then
         "$@"
     else
-        echo "Cancelled by user"
+        echo "Cancelled by user";
+        return 1;
     fi
 }
 
