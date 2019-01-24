@@ -708,7 +708,7 @@ function bash_most_used() {
 alias npmscripts='less package.json | any2csv --path scripts | ptr | plook -n -a'
 
 function timestamp() {
-    date '+%Y%m%d_%H%m%S';
+    date '+%Y%m%d_%H%M%S';
 }
 
 function macro_record() {
