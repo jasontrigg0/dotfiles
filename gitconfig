@@ -50,3 +50,8 @@
             desktop-save-mode 0)\
       (ediff-merge-files-with-ancestor \\\"$LOCAL\\\" \\\"$REMOTE\\\"\
                                        \\\"$BASE\\\" nil \\\"$MERGED\\\"))\"
+#https://cscheng.info/2017/01/26/git-tip-autostash-with-git-pull-rebase.html
+[pull]
+	rebase = true
+[rebase]
+	autoStash = true
