@@ -203,7 +203,9 @@ promptFunc() {
 #     fi
 # }
 
-
+function h() {
+    cat -A ~/.full_history | grep $1 | less +G;
+}
 
 
 #####
