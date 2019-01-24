@@ -740,8 +740,6 @@ ANDROID_NDK=/opt/android-ndk-r14
 ANDROID_PATH=/opt/android-sdk/tools:/opt/android-sdk/platform-tools:/opt/android-ndk-r14:$ANDROID_HOME/platforms:$ANDROID_HOME/tools
 export PATH=$PATH:$HOME/local/bin:$HOME/scripts:$GOPATH/bin:$HOME/Files/play:"$ANDROID_PATH"
 
-# export NVM_DIR="$HOME/.nvm"
-# [ -s "$NVM_DIR/nvm.sh" ] && source "$NVM_DIR/nvm.sh"  # This loads nvm
 
 function steam() { rm ~/.local/share/Steam/ubuntu12_32/steam-runtime/i386/usr/lib/i386-linux-gnu/libstdc++.so.6;
                    rm ~/.local/share/Steam/ubuntu12_32/steam-runtime/i386/usr/lib/i386-linux-gnu/libgcc_s.so.1;
@@ -851,61 +849,12 @@ function fix_numpy() { less /var/lib/dpkg/status | pawk -b 'x=0' -p 'if "Package
 # . /home/jtrigg/torch/install/bin/torch-activate
 # export PATH=/usr/local/cuda/bin/:$PATH;
 # export LD_LIBRARY_PATH=/usr/local/cuda/lib64/:$LD_LIBRARY_PATH;
-# export TIEFVISION_HOME=/home/jtrigg/github/tiefvision_dresses
-
 
 ###########
 # tensorflow setup
 ##########
 # export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/usr/local/cuda/lib64:/usr/local/cuda/extras/CUPTI/lib64"
 # export CUDA_HOME="/usr/local/cuda"
-
-
-###################
-# pantsme mysql
-###################
-
-# function dbwhere() { db "select * from start.product_variations where $1"; }
-# VAR_SELECT="pv.*, rb.name ref_brand, rb.available brand_available, pf.id pf_family_id, pf.title family_title, ps.id source_id, ps.external_id, ps.parent_external_id, ps.features, ps.product_type_name, ps.editorial_reviews, ps.blacklist, ps.blacklist_score"
-# function var() { dbtp 'SELECT '"$VAR_SELECT"' FROM start.product_sources ps LEFT JOIN start.product_variations pv ON ps.variation_id = pv.id LEFT JOIN start.brand_lookup bl ON pv.brand = bl.name LEFT JOIN start.reference_brands rb ON bl.brand_id = rb.id LEFT JOIN start.product_family_ids pfi ON pv.id = pfi.variation_id LEFT JOIN start.product_families pf ON pfi.family_id = pf.id WHERE pv.id = "'$1'"'; }
-# function plotvar() { db -r 'SELECT image_url FROM product_variations pv WHERE pv.id = "'$1'"' | $MS_DIR/start_python/start/scripts/plotting.py; }
-# function src() { dbtp 'SELECT * FROM product_sources ps WHERE ps.id = '$1''; }
-# function brand() { dbtp 'SELECT bl.name lookup_name, rb.* FROM reference_brands rb LEFT JOIN brand_lookup bl ON rb.id = bl.brand_id WHERE rb.name REGEXP "'"$1"'" OR bl.name REGEXP "'"$1"'"'; }
-# function fam() { db 'SELECT pf.* FROM product_families pf JOIN reference_brands rb ON rb.id = pf.brand_id WHERE rb.name REGEXP "'"$1"'"'; }
-
-# function asin_var() { dbtp 'SELECT '"$VAR_SELECT"' FROM start.product_sources ps LEFT JOIN start.product_variations pv ON ps.variation_id = pv.id LEFT JOIN start.brand_lookup bl ON pv.brand = bl.name LEFT JOIN start.reference_brands rb ON bl.brand_id = rb.id LEFT JOIN start.product_family_ids pfi ON pv.id = pfi.variation_id LEFT JOIN start.product_families pf ON pfi.family_id = pf.id WHERE (ps.origin_id in ("2","3") and ps.external_id = "'$1'")'; }
-# function sibs() { db 'SELECT '"$VAR_SELECT"' FROM start.product_sources ps LEFT JOIN start.product_variations pv ON ps.variation_id = pv.id LEFT JOIN start.reference_brands rb ON pv.brand_id = rb.id LEFT JOIN start.product_families pf ON pf.id = pv.family_id JOIN product_sources ps2 ON ps2.parent_id = ps.parent_id WHERE (ps2.origin_id IN ("2","3") and ps2.external_id = "'$1'") OR ps2.variation_id = "'$1'"'; }
-# function blacklist() { db 'UPDATE start.product_sources ps SET ps.blacklist = 1 WHERE (ps.origin_id IN ("2","3") AND ps.external_id = "'$1'") OR ps.variation_id = "'$1'"'; }
-# function blacklist_sibs() { db 'UPDATE start.product_sources ps JOIN start.product_sources ps2 ON ps.parent_id = ps2.parent_id SET ps.blacklist = 1 WHERE ps2.external_id = "'$1'" OR ps2.variation_id = "'$1'"'; }
-# function blacklist_merge() { db 'DELETE pv FROM start.product_variations pv INNER JOIN start.product_sources ps ON ps.variation_id = pv.id WHERE (ps.blacklist OR ps.blacklist_score > 0.5)'; }
-
-# function asin() { google-chrome "http://www.amazon.com/dp/$1";
-# }
-# function offers() { db 'SELECT pso.* FROM start.product_sources ps LEFT JOIN start.product_variations pv ON ps.variation_id = pv.id LEFT JOIN start.product_source_offers pso ON pso.source_id = ps.id and pso.origin_id = ps.origin_id WHERE ps.external_id = "'$1'"'; }
-
-# MS_DIR=$HOME/github/mysize_shopping;
-
-
-# function color() { $MS_DIR/start_python/start/augment_jeans/process_image.py --asin "$1"; $MS_DIR/start_python/start/augment_jeans/main.py --sibling_variation "$1"; }
-
-# function ms() { cd $MS_DIR; }
-# function ffms() { ff $1 | grep -v build; }
-# function eff() { emacs $(ff.py -p $1 -d ${2:-$MS_DIR} | head -1); }
-
-
-# function not_jeans() { db 'INSERT INTO start.image_classes (image_url, is_jeans) SELECT image_url,0 FROM start.product_sources ps WHERE ps.variation_id = "'$1'" OR ps.external_id = "'$1'" ON DUPLICATE KEY UPDATE is_jeans = 0'; }
-# function not_jeans() { mark_jeans $1 0; }
-# function is_jeans()  { mark_jeans $1 1; }
-# function mark_jeans() { db 'INSERT INTO start.image_classes (image_url, is_jeans) SELECT image_url,'$2' FROM start.product_sources ps WHERE ps.id = "'$1'" ON DUPLICATE KEY UPDATE is_jeans = '$2''; }
-# function mark_jeans_asin() { db 'INSERT INTO start.image_classes (image_url, is_jeans) SELECT image_url,'$2' FROM start.product_sources ps WHERE ps.external_id = "'$1'" ON DUPLICATE KEY UPDATE is_jeans = '$2''; }
-# function mark_jeans_var() { db 'INSERT INTO start.image_classes (image_url, is_jeans) SELECT image_url,'$2' FROM start.product_sources ps WHERE ps.variation_id = "'$1'" ON DUPLICATE KEY UPDATE is_jeans = '$2''; }
-
-# function flag() { ${MS_DIR}/start_python/start/modelling/blacklist_jeans.py -l -p --variation "$1" -v; blacklist_sibs "$1"; not_jeans "$1"; }
-
-# #startup ssh execute
-# function sse() { ssh deploy@pants-me.com -t "$1"; }
-
-
 
 ##########
 # play (framework)
@@ -928,13 +877,6 @@ function fix_numpy() { less /var/lib/dpkg/status | pawk -b 'x=0' -p 'if "Package
 #     ./deploy.sh
 #     cd -
 # }
-
-
-
-######
-#start cloth simulation
-#######
-# function cloth() { cd /home/jtrigg/github/mysize_shopping/experimental/cloth; (python -m http.server 31014 &); while [ 1 ]; do node --max_old_space_size=4000 ./node_modules/.bin/gulp; sleep 3; done; }
 
 
 ######
