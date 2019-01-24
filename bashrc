@@ -565,6 +565,10 @@ function cp_branch_master() {
     # git push
 }
 
+function gf() {
+    git diff --color=always HEAD -U0 -G"$1" | less -r +/"$1";
+}
+
 function git_revert_file() {
     #https://stackoverflow.com/a/7196615
     confirm git show HEAD -- $1 | git apply -R
