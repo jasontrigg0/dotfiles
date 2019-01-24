@@ -339,6 +339,12 @@ alias paste='xclip -sel clip -o'
 #$1 is the source of the link, $2 is the destination
 alias ln='ln -snfr'
 
+function swap()
+{
+    local TMPFILE=tmp.$$
+    mv "$1" $TMPFILE && mv "$2" "$1" && mv $TMPFILE $2
+}
+
 ############
 # open / emacs
 ############
