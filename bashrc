@@ -940,7 +940,7 @@ function archdown() {
 }
 
 function archls() {
-    ssh $STORAGE_SERVER_USER@$STORAGE_SERVER ls -l /upload
+    ssh $STORAGE_SERVER_USER@$STORAGE_SERVER ls -lA /upload
 }
 
 function archrm() {
