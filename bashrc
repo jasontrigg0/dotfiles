@@ -816,32 +816,71 @@ function fix_numpy() { less /var/lib/dpkg/status | pawk -b 'x=0' -p 'if "Package
 # fi
 
 
-# function quote() {
-#     #function from:
-#     #https://www.jefftk.com/p/bash-argument-parsing-and-quoting
+function quote() {
+    #problem:
+    #given some bash expression
+    #eg: awk '{print $1}'
+    #how to use it as an argument to another function?
+    #eg new_function $my_awk_var
 
-#     #related: good comments about quoting / variable expansion:
-#     #http://stackoverflow.com/a/13819996
-#     #http://unix.stackexchange.com/a/109074
-#     first=true
-#     for arg in "$@"; do
-#         if $first; then first=false; else echo -n " "; fi
-#         if echo "$arg" | grep -q '[^a-zA-Z0-9./_=-]'; then
-#             arg="'$(echo "$arg" | sed -e 's~\\~\\\\~g' -e "s~'~\\\\'~g")'"
-#         fi
-#         echo -n "$arg"
-#     done
-#     echo
-# }
+    #Simple case:
+    #copy: awk '{print $1}'
+    #THEN
+    #new_function "$(paste)"
+    #OR
+    #arg=$(paste)
+    #new_function "$arg"
+    #OR
+    #paste > bash_command_pasted_in_file.sh
+    #new_function "$(cat bash_command_pasted_in_file.sh)"
+
+
+    #But what about multiple layers?
+    #Example:
+    #awk '{print $1}'
+    #but you want to wrap that in bash
+    #bash -c 'my awk in here'
+    #and maybe you want to wrap *that* in ssh:
+    #ssh jtrigg@example.com 'my bash in here'
+
+    #Works like this:
+    #cmd1='{print $1}'
+    #cmd2='echo "hey" | awk '"$(quote $cmd1)"
+    #cmd3='bash -c '"$(quote $cmd2)"
+    #ssh jtrigg@example.com "$cmd3"
+    #OR all at once:
+    #ssh jtrigg@example.com 'bash -c '"$(quote 'echo "hey" | awk '$(quote '{print $1}'))"
+
+
+    #quote function modified from:
+    #https://www.jefftk.com/p/bash-argument-parsing-and-quoting
+
+    #related: good comments about quoting / variable expansion:
+    #http://stackoverflow.com/a/13819996
+    #http://unix.stackexchange.com/a/109074
+
+    if [ -z "$1" ]; then
+        arglist="$(cat - )";
+    else
+        arglist="$@";
+    fi
+
+    for arg in "$arglist"; do
+        if echo "$arg" | grep -q '[^a-zA-Z0-9./_=-]'; then
+            #fix: original function was choking on the two character string: ')
+            #and single backslash: \
+            arg="'$(echo "$arg" | sed -e "s~'~'\\\\''~g")'"
+        fi
+        echo -n "$arg"
+    done
+
+    echo
+}
+
+
 
 # function unquote() { echo "$1" | xargs echo; }
 
-
-
-
-##########################################
-#######personal stuff starts here#######
-##########################################
 
 ###########
 #torch setup
