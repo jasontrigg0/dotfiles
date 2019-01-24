@@ -369,8 +369,10 @@ function sb() { source ~/.bashrc; }
 function eg() {
     if [ -z "$1" ]; then
         $EDITOR $(ag -g "" | percol);
-    else
+    elif [ -z "$2" ]; then
         $EDITOR $(ag -g "$1" | percol);
+    else
+        $EDITOR $(ag "$@" | percol);
     fi;
 }
 alias ag="ag -W 120 --hidden" #limit ag results to 120 characters per line, also show hidden files such as .env by default
