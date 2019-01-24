@@ -387,7 +387,7 @@ function k() { ps aux | percol | awk '{ print $2 }' | xargs kill; }
 function k9() { ps aux | percol | awk '{ print $2 }' | xargs kill -9; }
 # function psg() { ps -ef | grep "$1"; }
 function kt() { pkill -9 -P $$; } #kill all children of this terminal
-
+function getport() { pid=$(ss -tanp | grep "$1" | perl -n -e'/pid=(\d+)/ && print $1'); if [ -n "$pid" ]; then ps -ef | awk '$2=='"$pid"; fi }
 
 #######
 # communication
