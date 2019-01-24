@@ -1,0 +1,36 @@
+#!/bin/sh
+
+echo "[pre-commit hook] running"
+
+# Allows us to read user input below, assigns stdin to keyboard
+# https://stackoverflow.com/a/10015707
+exec < /dev/tty
+
+yn_confirm() {
+    read -p "$1 [y/n]  " REPLY
+    echo
+    if test "$REPLY" = "y" -o "$REPLY" = "Y"; then
+        return 0;
+    else
+        return 1;
+    fi
+}
+
+DIFF='git diff --cached HEAD -U0 --no-color'
+
+if $DIFF | grep -q MUST; then
+    $DIFF | grep MUST;
+    echo "MUST still in diff. Fix before committing..."
+    exit 1
+fi
+
+if $DIFF | grep '^+' | grep -q console.log; then
+    $DIFF | grep '^+' | grep console.log;
+    yn_confirm "console.log in diff. Are you sure you want to commit?"
+    if [ $? -ne 0 ]; then
+        echo "exiting..."
+        exit 1
+    fi
+fi
+
+exit 0
