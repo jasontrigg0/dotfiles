@@ -772,7 +772,7 @@ function quickserve {
 # then automatically put us into a screen(1) session.   Only try once
 # -- if $STARTED_SCREEN is set, don't try it again, to avoid looping
 # if screen fails for some reason.
-if [ "$PS1" != "" -a "${STARTED_SCREEN:-x}" = x -a "${SSH_TTY:-x}" != x ]
+if [ "$PS1" != "" -a "${STARTED_SCREEN:-x}" = x -a "${SSH_CONNECTION:-x}" != x -a "${SSH_TTY:-x}" = x ]  #allow ssh -t without logging into screen, eg to run sudo from command line
 then
   STARTED_SCREEN=1 ; export STARTED_SCREEN
   screen -RR -S main || echo "Screen failed! continuing with normal bash startup"
@@ -946,3 +946,7 @@ function archmv() {
     archdown $1 $2;
     archrm $1;
 }
+
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
