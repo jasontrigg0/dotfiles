@@ -1,9 +1,11 @@
 (require 'package)
 (require 'cl-lib)
 
+;;List of packages to install:
 (let* ((packages '(elpy
                    web-mode
                    csv-mode
+                   ag
                    ))
        (uninstalled-packages (cl-remove-if 'package-installed-p packages)))
 

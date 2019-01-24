@@ -44,8 +44,11 @@
 
 (setq visible-bell t) ;; turn off annoying bell sound: http://emacsredux.com/blog/2016/02/14/disable-annoying-audio-notifications/
 
+;;search this git project
+;;
 (global-set-key (kbd "M-s ;") 'ag-project)
 (global-set-key (kbd "M-s :") 'ag-project-files) ;; search for a certain extension
+(global-set-key (kbd "M-s '") 'ag-project-dired) ;; search files in the directory
 
 ;;git tools
 (global-set-key (kbd "M-s g") 'git-timemachine-toggle)
@@ -95,6 +98,13 @@
 (setq web-mode-code-indent-offset 2)
 (setq web-mode-markup-indent-offset 2)
 (setq web-mode-css-indent-offset 2)
+
+;set web-mode to comment javascript with // instead of /* */
+;https://emacs.stackexchange.com/a/27714
+;first solution gives loading error
+(setq-default web-mode-comment-formats
+              '(("javascript" . "//")
+                ("ts" . "//")))
 
 ;emacs-copy also copies + pastes to/from the clipboard
 ;possibly requires installing xclip 1.3 in emacs24 also?
@@ -154,15 +164,15 @@
 ;revert buffer
 (global-set-key (kbd "C-c r") 'revert-buffer)
 
+;save-as
+(global-set-key (kbd "C-c R") 'rename-file-and-buffer)
+
 ;regex search by default
 (global-set-key (kbd "C-s") 'isearch-forward-regexp)
 (global-set-key (kbd "\C-r") 'isearch-backward-regexp)
 (global-set-key (kbd "C-M-s") 'isearch-forward)
 (global-set-key (kbd "C-M-r") 'isearch-backward)
 
-
-;save-as
-(global-set-key (kbd "C-c R") 'rename-file-and-buffer)
 
 ;; source: http://steve.yegge.googlepages.com/my-dot-emacs-file
 ;; added (shell-command (concat "chmod u+x " new-name))
@@ -256,8 +266,6 @@ Position the cursor at its beginning, according to the current mode."
     (move-end-of-line nil)
     (newline-and-indent))
 
-(global-set-key [(shift return)] 'smart-open-line)
-
 (defun smart-open-line-above ()
     "Insert an empty line above the current line.
 Position the cursor at it's beginning, according to the current mode."
@@ -266,8 +274,6 @@ Position the cursor at it's beginning, according to the current mode."
     (newline-and-indent)
     (forward-line -1)
     (indent-according-to-mode))
-
-(global-set-key [(control shift return)] 'smart-open-line-above)
 
 (global-set-key (kbd "M-n") 'smart-open-line)
 ;;was using "M-O" for smart-open-line-above but then
@@ -312,7 +318,7 @@ Position the cursor at it's beginning, according to the current mode."
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(ag-arguments (quote ("--smart-case" "--stats" "-A 5" "-B 5")))
- '(package-selected-packages (quote (csv-mode web-mode elpy))))
+ '(package-selected-packages (quote (ag csv-mode web-mode elpy))))
 
 (defun module_fns ()
   (interactive)
