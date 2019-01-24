@@ -215,3 +215,8 @@ bindsym --release Shift+Print exec scrot -s 'screenshot_%Y%m%d_%H%M%S.png' -e 'm
 #run autostart commands (eg /etc/xdg/autostart or $HOME/.config/autostart) with i3
 #https://faq.i3wm.org/question/2155/how-can-i-use-autostart-desktop-files-in-i3.1.html
 exec dex -ae i3
+
+#natural scrolling (can't get it to work)
+# exec --no-startup-id synclient NaturalScrolling=1 VertScrollDelta=-113
+# exec --no-startup-id synclient HorizEdgeScroll=1 VertEdgeScroll=1 VertScrollDelta=-111
+# exec synclient VertScroll=-79 synclient HorizScroll=-79
