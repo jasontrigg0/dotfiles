@@ -627,7 +627,10 @@ function g91() {
     shift;
     g21 "$@";
 }
-
+function gd91() {
+    GITPATH=$(git ls-tree --full-name --name-only HEAD ${2});
+    git diff ${1}:$GITPATH ${2};
+}
 #TODO: try https://gist.github.com/mwhite/6887990
 alias diff="git diff --no-index" #git style diff from the command line
 alias gd="git diff"
