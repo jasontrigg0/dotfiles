@@ -612,7 +612,7 @@ alias g13="git commit"
 #alias g23="git commit"
 alias g21="confirm git checkout --"
 alias g32="_drop_final_dot git reset --"
-alias g31="confirm git checkout HEAD --" #doesn't work on all files (with or without .)
+alias g31="_drop_final_dot confirm git checkout --force"
 function g92() {
     #pull from a diff into staging location (= 2)
     #usage: g92 DIFF file1 file2...
