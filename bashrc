@@ -763,6 +763,22 @@ function scantopdf() {
 function catpdfs() {
     pdftk "$@" cat output -;
 }
+function decryptpdf() {
+    temp_file=$(mktemp)
+    echo -n "Password: "
+    read -s PASSWORD
+    qpdf --password="$PASSWORD" --decrypt "$1" $temp_file && mv $temp_file "$1"
+    rm -f $temp_file
+}
+
+#https://askubuntu.com/a/256449
+#use /screen instead of /ebook for maximum compression
+function compresspdf() {
+    temp_file=$(mktemp)
+    \gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPDFSETTINGS=/ebook -dNOPAUSE -dBATCH  -dQUIET -sOutputFile="$temp_file" "$1" && mv "$temp_file" "$1"
+    rm -f "$temp_file"
+}
+
 function mic() { amixer set Capture toggle; } # mute/unmute mic
 
 # Add an "alert" alias for long running commands.  Use like so:
