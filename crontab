@@ -11,3 +11,6 @@ MAILTO="jasontrigg0@gmail.com"
 0 12    * * *   jtrigg	/home/jtrigg/git/web-tracker/web-tracker/tracker.py > /dev/null
 0 13   * * *   jtrigg	python /home/jtrigg/misc_code/boltbus/scraper.py > /dev/null
 #0 0    * * *   root nctu -f /home/jtrigg/.ncdu /
+
+#running from root crontab so it can run apt-get and scan all files
+#export XAUTHORITY=/run/user/1000/gdm/Xauthority && export DISPLAY=:0 && test $(zenity --list --column='Run virus scan?' "Yes" "No" 2>/dev/null) = "Yes" && echo "test" && apt-get -qq -y install clamav && clamscan -r / -i --exclude-dir=^/sys --exclude-dir=^/dev --exclude-dir=^/proc
