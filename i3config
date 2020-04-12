@@ -229,3 +229,17 @@ exec dex -ae i3
 # exec --no-startup-id synclient NaturalScrolling=1 VertScrollDelta=-113
 # exec --no-startup-id synclient HorizEdgeScroll=1 VertEdgeScroll=1 VertScrollDelta=-111
 # exec synclient VertScroll=-79 synclient HorizScroll=-79
+
+# clear ~/Downloads/arch_ops folder (for operations)
+bindsym $mod+c exec "find ~/Downloads/arch_ops -mindepth 1 -delete"
+
+# read input and zip the files in ~/Downloads/arch_ops into a zip file of that name
+bindsym $mod+z exec i3-input -F 'exec cd /home/jtrigg/Downloads/arch_ops && zip -r "%s.zip" ./*'
+
+# open last arch download
+#bindsym $mod+t exec 'f=$(ls -A1u /home/jtrigg/Downloads/arch_ops | head -1); o /home/jtrigg/Downloads/arch_ops/"$f"; &> /tmp/out'
+bindsym $mod+t exec xdg-open "/home/jtrigg/Downloads/arch_ops/$(ls -A1u /home/jtrigg/Downloads/arch_ops | head -1)"
+bindsym $mod+y exec acroread "/home/jtrigg/Downloads/arch_ops/$(ls -A1u /home/jtrigg/Downloads/arch_ops | head -1)"
+
+#for some reason can't get chained xdotool commands to work inline so calling a script:
+bindsym --release $mod+shift+o exec i3-input -F 'exec /home/jtrigg/git/arch/scripts/arch_i3_keyboard_shortcuts/arch.sh %s'
