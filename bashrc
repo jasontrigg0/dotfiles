@@ -989,3 +989,12 @@ export NODE_PATH=$NODE_PATH:/home/jtrigg/.nvm/versions/node/v10.11.0/lib/node_mo
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+function copyenv() {
+    ENV_FILE=$1;
+    OUTPUT_DIR=${2:-$PWD};
+    OUTPUT_DIR=$(realpath "$OUTPUT_DIR")
+    cd $(git rev-parse --show-toplevel);
+    cp $(find . -name "$ENV_FILE" | head -1) "$OUTPUT_DIR";
+    cd - > /dev/null;
+}
