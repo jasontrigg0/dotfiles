@@ -204,7 +204,7 @@ promptFunc() {
 # }
 
 function h() {
-    cat -A ~/.full_history | grep $1 | less +G;
+    cat -A ~/.full_history | grep -a "$1" | less +G;
 }
 
 
