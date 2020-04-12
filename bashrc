@@ -586,7 +586,7 @@ function git_old() {
 #view all diffs to a given file: git log -p $FILE
 #grep through diffs: git log -p -G $GREP
 #     OR             git log --stat -G $GREP
-#grep through commit messages git lop -g --grep $GREP
+#grep through commit messages git log -p --grep $GREP
 
 #want git aliases+functions that
 #apply to all files work with or without ".".
