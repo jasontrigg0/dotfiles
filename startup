@@ -1,3 +1,2 @@
 #!/bin/bash
-fcitx
 /usr/local/bin/earlyoom -m 2 -s 100
