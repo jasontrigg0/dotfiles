@@ -737,7 +737,7 @@ function csvsplit() {
     python -c 'print("'"$1"'".split(",")['"$2"'])';
 }
 
-alias lock='i3lock -n'
+alias lock='i3lock -c 000000 -n'
 
 # export GOPATH=$HOME/go
 # export ANDROID_HOME=$HOME/Files/android_dev/android-sdk-linux
