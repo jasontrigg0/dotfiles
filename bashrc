@@ -981,6 +981,11 @@ function archmv() {
     archrm $1;
 }
 
+#https://flaviocopes.com/where-npm-install-packages/
+#npm root -g  shows the current install directory
+export NODE_PATH=$NODE_PATH:/home/jtrigg/.nvm/versions/node/v10.11.0/lib/node_modules
+#export NODE_OPTIONS="--max-old-space-size=2048"
+
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
