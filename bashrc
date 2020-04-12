@@ -941,11 +941,21 @@ function quote() {
 #     cd -
 # }
 
-
 ######
 #swift setup
 #####
 # export PATH=$HOME/files/swift-3.1.1-RELEASE-ubuntu16.04/usr/bin:"${PATH}"
+
+function print_pdf_to_ip() {
+    #convert pdf to jpeg and then send through netcat
+    pdf_file=$(readlink -f "$1")
+    ip="$2"
+    cd $(mktemp -d) #tempdir
+    pdftoppm "$pdf_file" page -jpeg
+    for file in page*; do
+        cat "$file" | netcat -w 1 "$ip" 9100
+    done
+}
 
 
 ##commands for easy upload/download to storage server
