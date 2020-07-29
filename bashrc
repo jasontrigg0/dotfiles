@@ -759,7 +759,9 @@ ANDROID_HOME=/opt/android-sdk
 ANDROID_NATIVE_API_LEVEL=android-19
 ANDROID_NDK=/opt/android-ndk-r14
 ANDROID_PATH=/opt/android-sdk/tools:/opt/android-sdk/platform-tools:/opt/android-ndk-r14:$ANDROID_HOME/platforms:$ANDROID_HOME/tools
-export PATH=$PATH:$HOME/local/bin:$HOME/scripts:$GOPATH/bin:$HOME/Files/play:"$ANDROID_PATH"
+
+JAVA_HOME=`type -p java|xargs readlink -f|xargs dirname|xargs dirname`
+export PATH=$PATH:$HOME/local/bin:$HOME/scripts:$GOPATH/bin:$HOME/Files/play:"$ANDROID_PATH":"$JAVA_HOME/bin"
 
 
 function steam() { rm ~/.local/share/Steam/ubuntu12_32/steam-runtime/i386/usr/lib/i386-linux-gnu/libstdc++.so.6;
@@ -919,6 +921,9 @@ function quote() {
 
 # function unquote() { echo "$1" | xargs echo; }
 
+
+#cudnn (using for lc0)
+export LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH
 
 ###########
 #torch setup
