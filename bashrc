@@ -646,6 +646,20 @@ alias gd32="git diff --cached"
 alias gitroot='cd $(git rev-parse --show-toplevel) && echo "$_"'
 
 
+pushtomerge () {
+    BRANCH_NAME=`git symbolic-ref HEAD 2>/dev/null | cut -d"/" -f 3`;
+    git push -o merge_request.create -o merge_request.target=master --set-upstream origin ${1:-${BRANCH_NAME}}
+}
+
+nb () {
+    if [ -z \"$1\" ]; then
+        echo \"Need a branch name\";
+    else
+        git fetch origin && git checkout -b $1 origin/master;
+    fi
+}
+
+
 #git shortcuts
 # function gs() { git status; }
 #gl now used for gitless
