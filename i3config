@@ -34,6 +34,8 @@ set $mod Mod4
 
 # use Mouse+Mod1 to drag floating windows to their wanted position
 floating_modifier $mod
+floating_minimum_size 75 x 50
+floating_maximum_size 1600 x 1200
 
 # start a terminal
 bindsym $mod+Return exec i3-sensible-terminal
@@ -191,9 +193,9 @@ bar {
 ###
 #enable fn keys:
 ###
-bindsym XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume 0 +5% #increase sound volume
-bindsym XF86AudioLowerVolume exec --no-startup-id pactl set-sink-volume 0 -5% #decrease sound volume
-bindsym XF86AudioMute exec --no-startup-id pactl set-sink-mute 0 toggle # mute sound
+bindsym XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ +5% #increase sound volume
+bindsym XF86AudioLowerVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ -5% #decrease sound volume
+bindsym XF86AudioMute exec --no-startup-id pactl set-sink-mute @DEFAULT_SINK@ toggle # mute sound
 
 # Sreen brightness controls
 bindsym XF86MonBrightnessUp exec xbacklight -inc 20 # increase screen brightness
@@ -231,15 +233,14 @@ exec dex -ae i3
 # exec synclient VertScroll=-79 synclient HorizScroll=-79
 
 # clear ~/Downloads/arch_ops folder (for operations)
-bindsym $mod+c exec "find ~/Downloads/arch_ops -mindepth 1 -delete"
+bindsym $mod+c exec "find ~/work/ops_dir -mindepth 1 -delete"
 
 # read input and zip the files in ~/Downloads/arch_ops into a zip file of that name
-bindsym $mod+z exec i3-input -F 'exec cd /home/jtrigg/Downloads/arch_ops && zip -r "%s.zip" ./*'
+bindsym $mod+z exec i3-input -F 'exec cd /home/jason/work/ops_dir && zip -r "%s.zip" ./*'
 
 # open last arch download
-#bindsym $mod+t exec 'f=$(ls -A1u /home/jtrigg/Downloads/arch_ops | head -1); o /home/jtrigg/Downloads/arch_ops/"$f"; &> /tmp/out'
-bindsym $mod+t exec xdg-open "/home/jtrigg/Downloads/arch_ops/$(ls -A1u /home/jtrigg/Downloads/arch_ops | head -1)"
-bindsym $mod+y exec acroread "/home/jtrigg/Downloads/arch_ops/$(ls -A1u /home/jtrigg/Downloads/arch_ops | head -1)"
+bindsym $mod+t exec "i3-msg 'workspace 4; exec xdg-open /home/jason/work/ops_dir/\\"$(ls -A1u /home/jason/work/ops_dir | head -1)\\"'"
+bindsym $mod+y exec acroread -openInNewInstance "/home/jason/work/ops_dir/$(ls -A1u /home/jason/work/ops_dir | head -1)"
 
 #for some reason can't get chained xdotool commands to work inline so calling a script:
-bindsym --release $mod+shift+o exec i3-input -F 'exec /home/jtrigg/git/arch/scripts/arch_i3_keyboard_shortcuts/arch.sh %s'
+bindsym --release $mod+shift+o exec i3-input -F 'exec /home/jason/work/arch/scripts/arch_i3_keyboard_shortcuts/arch.sh %s'
