@@ -108,7 +108,7 @@
 
 ;emacs-copy also copies + pastes to/from the clipboard
 ;possibly requires installing xclip 1.3 in emacs24 also?
-(load-file "/home/jtrigg/.emacs.d/xclip.el")
+(load-file "/home/jason/.emacs.d/xclip.el")
 
 
 ;automatically run chmod +x when appropriate

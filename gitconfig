@@ -8,10 +8,10 @@
        name = Jason Trigg
        username = jasontrigg0
 [core]
-       excludesfile = /home/jtrigg/.gitignore
+	excludesfile = /home/jason/.gitignore
        #https://www.viget.com/articles/dress-up-your-git-diffs-with-word-level-highlights
        #curl https://raw.githubusercontent.com/git/git/fd99e2bda0ca6a361ef03c04d6d7fdc7a9c40b78/contrib/diff-highlight/diff-highlight > /home/jtrigg/scripts/diff-highlight && chmod +x /home/jtrigg/scripts/diff-highlight
-       pager = /home/jtrigg/scripts/diff-highlight | less
+       pager = /home/jason/scripts/diff-highlight | less
 # [multimailhook]
 #        emailPrefix = [Commit]
 [color]
