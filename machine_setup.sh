@@ -3,7 +3,7 @@
 sudo apt install emacs
 sudo apt install git
 sudo apt install scid
-sudo apt install curl
+sudo apt install curl #Y
 sudo apt install pgn-extract
 # cd ~ && wget -O - "http://www.dropbox.com/download?plat=lnx.x86_64" | tar xz
 # sudo apt install python-dev
@@ -55,10 +55,10 @@ sudo pip3 install mysqlclient
 #https://www.viget.com/articles/dress-up-your-git-diffs-with-word-level-highlights
 #prettier git diffs
 mkdir -p $HOME/scripts
-curl https://raw.githubusercontent.com/git/git/fd99e2bda0ca6a361ef03c04d6d7fdc7a9c40b78/contrib/diff-highlight/diff-highlight > $HOME/scripts/diff-highlight && chmod +x $HOME/scripts/diff-highlight
+curl https://raw.githubusercontent.com/git/git/fd99e2bda0ca6a361ef03c04d6d7fdc7a9c40b78/contrib/diff-highlight/diff-highlight > $HOME/scripts/diff-highlight && chmod +x $HOME/scripts/diff-highlight #Y
 
 #ag
-sudo apt install silversearcher-ag
+sudo apt install silversearcher-ag #Y
 
 #easy screenshot sending
 curl -s https://packagecloud.io/install/repositories/gyazo/gyazo-for-linux/script.deb.sh | sudo bash
@@ -99,7 +99,8 @@ sudo chmod +x /usr/bin/noti
 sudo apt install dex
 
 #concat pdfs
-sudo apt install pdftk
+sudo apt install pdftk #Y
+sudo apt install qpdf #Y
 
 #https://github.com/mbostock/gistup
 npm install -g gistup
@@ -111,7 +112,7 @@ sudo apt install powertop
 sudo apt install nethogs
 
 #percol
-sudo pip install percol
+sudo pip install percol #Y
 
 #watch files and run command when they change
 #https://github.com/clibs/entr
@@ -130,7 +131,7 @@ sudo curl -L https://github.com/docker/compose/releases/download/1.19.0/docker-c
 sudo apt install pv
 
 #for i3 screenshot shortcuts
-sudo apt install scrot
+sudo apt install scrot #Y
 
 #for storing secret files on git
 sudo apt install git-crypt
@@ -138,3 +139,6 @@ sudo apt install git-crypt
 #chromedriver
 sudo apt-get install chromium-chromedriver
 sudo cp /usr/lib/chromium-browser/chromedriver /usr/bin/chromedriver
+
+#fix live video issues (ff only?)
+sudo apt install ffmpeg #Y
