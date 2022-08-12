@@ -6,7 +6,7 @@
 
 dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )" #this script's directory
 olddir=$(dirname $dir)/dotfiles_old #old dotfiles backup directory
-files="bashrc bash_profile emacs gitignore gitconfig agignore startup screenrc inputrc pypirc" #list of files/folders to symlink in homedir
+files="bashrc bash_profile bash_private emacs gitignore gitconfig agignore startup screenrc inputrc pypirc" #list of files/folders to symlink in homedir
 
 
 # create dotfiles_old in homedir
@@ -81,6 +81,7 @@ sudo sed -i 's/AuthPass=/AuthPass='"$MAILER_PASSWORD"'/g' /etc/ssmtp/ssmtp.conf
 #https://askubuntu.com/a/54861
 #"It's a bad idea to symlink scripts [to /etc/cron.d] that are owned and writable for non-root users, since your system could be compromised that way"
 sudo chown root $dir/crontab
+sudo chmod 600 $dir/crontab
 sudo ln -snf $dir/crontab /etc/cron.d/jtrigg
 #check the crontab logs here:
 #grep -i cron /var/log/syslog
