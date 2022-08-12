@@ -362,6 +362,7 @@ alias l="less"
 alias e="emacsclient --alternate-editor= -t"
 alias emacs="emacsclient --alternate-editor= -t"
 export EDITOR="emacsclient --alternate-editor= -t"
+alias acroread="acroread -openInNewInstance"
 
 function eb() { $EDITOR $(readlink -f ~/.bashrc); }
 function ebp() { $EDITOR $(readlink -f ~/.bash_private); }
@@ -440,7 +441,7 @@ function weather() {
 # running bash / terminal commands
 #######
 function debug() { set -o functrace; set -x; $("$@"); set +x; set +o functrace; }
-function xsh() { cat - | tr '\n' '\0' | xargs -r -0 -n1 bash -c; } #run each line of /dev/stdin in bash (-r so it doesn't crash on empty input)
+function xsh() { cat - | tr '\n' '\0' | xargs -P1 -r -0 -n1 bash -c; } #run each line of /dev/stdin in bash (-r so it doesn't crash on empty input)
 function echoerr() { echo "$@" 1>&2; } #echo, but to /dev/stderr
 
 #fzf for searching history
@@ -637,6 +638,7 @@ alias gd="git diff"
 alias ga="git add"
 alias gc="git commit"
 alias gs="git status"
+alias gb="git branch --show-current"
 alias gd13="git diff HEAD"
 alias gd12="git diff"
 alias gd23="git diff --cached"
@@ -675,7 +677,9 @@ function gp() { git stash && git pull --rebase && git stash apply; }
 # function gg() { git log -p -S$1; }
 # function sgrep() { git grep "$@" -- ':/' ':/!*thirdparty*' ':/!*data*'; }
 
-
+function stashexcept() {
+    git stash push "$1" && git stash && git stash pop 1
+}
 
 
 
@@ -748,7 +752,8 @@ function macro_play() {
 }
 
 function csvsplit() {
-    python -c 'print("'"$1"'".split(",")['"$2"'])';
+    line=$(echo "$1" | tr -d '\n' | tr -d '\r');
+    python -c 'print("'"$line"'".split(",")['"$2"'])';
 }
 
 alias lock='i3lock -c 000000 -n'
@@ -760,8 +765,8 @@ ANDROID_NATIVE_API_LEVEL=android-19
 ANDROID_NDK=/opt/android-ndk-r14
 ANDROID_PATH=/opt/android-sdk/tools:/opt/android-sdk/platform-tools:/opt/android-ndk-r14:$ANDROID_HOME/platforms:$ANDROID_HOME/tools
 
-JAVA_HOME=`type -p java|xargs readlink -f|xargs dirname|xargs dirname`
-export PATH=$PATH:$HOME/local/bin:$HOME/scripts:$GOPATH/bin:$HOME/Files/play:"$ANDROID_PATH":"$JAVA_HOME/bin"
+#JAVA_HOME=`type -p java|xargs readlink -f|xargs dirname|xargs dirname`
+export PATH=$PATH:$HOME/local/bin:$HOME/scripts:$GOPATH/bin:$HOME/Files/play:"$ANDROID_PATH" #:"$JAVA_HOME/bin"
 
 
 function steam() { rm ~/.local/share/Steam/ubuntu12_32/steam-runtime/i386/usr/lib/i386-linux-gnu/libstdc++.so.6;
@@ -780,11 +785,17 @@ function catpdfs() {
     pdftk "$@" cat output -;
 }
 function decryptpdf() {
+    PASSWORD="$2"
+    if [ -z "$2" ]; then
+        echo -n "Password: "
+        read -s PASSWORD
+    fi
     temp_file=$(mktemp)
-    echo -n "Password: "
-    read -s PASSWORD
-    qpdf --password="$PASSWORD" --decrypt "$1" $temp_file && mv $temp_file "$1"
-    rm -f $temp_file
+    qpdf --no-warn --password="$PASSWORD" --decrypt "$1" $temp_file
+    if [ $? -eq 2 ]; then
+        return 1;
+    fi
+    mv $temp_file "$1" && rm -f $temp_file
 }
 
 #https://askubuntu.com/a/256449
@@ -794,6 +805,12 @@ function compresspdf() {
     \gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPDFSETTINGS=/ebook -dNOPAUSE -dBATCH  -dQUIET -sOutputFile="$temp_file" "$1" && mv "$temp_file" "$1"
     rm -f "$temp_file"
 }
+function compresspdfmax() {
+    temp_file=$(mktemp)
+    \gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPDFSETTINGS=/screen -dNOPAUSE -dBATCH  -dQUIET -sOutputFile="$temp_file" "$1" && mv "$temp_file" "$1"
+    rm -f "$temp_file"
+}
+
 
 function mic() { amixer set Capture toggle; } # mute/unmute mic
 
@@ -923,7 +940,7 @@ function quote() {
 
 
 #cudnn (using for lc0)
-export LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=/usr/local/cuda/lib64:/usr/lib:$LD_LIBRARY_PATH
 
 ###########
 #torch setup
@@ -977,6 +994,15 @@ function print_pdf_to_ip() {
 }
 
 
+function msgtopdf() {
+    temp_dir=$(mktemp -d)
+    msgconvert "$1" --outfile "$temp_dir/outfile.eml"
+    munpack "$temp_dir/outfile.eml" -C "$temp_dir"
+    cp "$temp_dir"/*pdf .
+    cp "$temp_dir"/*PDF .
+    rm -rf $temp_dir
+}
+
 ##commands for easy upload/download to storage server
 function archup() {
     scp "$1" $STORAGE_SERVER_USER@$STORAGE_SERVER:/upload
@@ -1011,9 +1037,11 @@ export NVM_DIR="$HOME/.nvm"
 
 function copyenv() {
     ENV_FILE=$1;
-    OUTPUT_DIR=${2:-$PWD};
-    OUTPUT_DIR=$(realpath "$OUTPUT_DIR")
-    cd $(git rev-parse --show-toplevel);
+    SOURCE_DIR=$2;
+    #OUTPUT_DIR=${2:-$PWD};
+    #OUTPUT_DIR=$(realpath "$OUTPUT_DIR");
+    OUTPUT_DIR=$(realpath .)
+    cd "$SOURCE_DIR" #$(git rev-parse --show-toplevel);
     cp $(find . -name "$ENV_FILE" | head -1) "$OUTPUT_DIR";
     cd - > /dev/null;
 }
