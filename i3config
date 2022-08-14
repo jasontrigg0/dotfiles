@@ -244,3 +244,7 @@ bindsym $mod+y exec acroread -openInNewInstance "/home/jason/work/ops_dir/$(ls -
 
 #for some reason can't get chained xdotool commands to work inline so calling a script:
 bindsym --release $mod+shift+o exec i3-input -F 'exec /home/jason/work/arch/scripts/arch_i3_keyboard_shortcuts/arch.sh %s'
+
+#secondary clipboard bound to ctrl+mod+c, ctrl+mod+v
+bindsym --release $mod+Control+c exec "xclip -sel clip -o > /tmp/clip.txt  && xdotool key --clearmodifiers ctrl+c && xclip -sel clip -o > /tmp/clip2.txt && cat /tmp/clip.txt | xclip -sel clip"
+bindsym --release $mod+Control+v exec "xclip -sel clip -o > /tmp/clip.txt && cat /tmp/clip2.txt | xclip -sel clip && xdotool key --clearmodifiers ctrl+v && cat /tmp/clip.txt | xclip -sel clip"
