@@ -65,6 +65,7 @@ curl -s https://packagecloud.io/install/repositories/gyazo/gyazo-for-linux/scrip
 sudo apt install gyazo
 
 sudo apt install i3
+sudo apt install xdotool
 sudo apt install jp2a
 
 sudo apt install screen
